@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEIS — Smart Indoor Environmental Intelligence System</title>
+    <!-- Modern typography & Chart.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-brand">
+            <div class="logo-icon">🌿</div>
+            <div>
+                <h1>SIEIS <span class="badge-v1">v1.0</span></h1>
+                <p class="subtitle">Smart Indoor Environmental Intelligence System</p>
+            </div>
+        </div>
+        <div class="nav-status-group">
+            <div id="device-pill" class="status-pill disconnected">
+                <span class="status-dot"></span>
+                <span id="device-status-text">Connecting...</span>
+            </div>
+            <div class="timestamp-display">
+                <span class="muted-label">Last Telemetry:</span>
+                <span id="last-seen-time" class="mono-text">--:--:--</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- System Alert Banner for Disconnection or Critical Anomalies -->
+        <div id="staleness-banner" class="banner banner-warning hidden">
+            ⚠️ <strong>Telemetry Stale:</strong> No data packets received from sensor node in over 30 seconds. Displaying last persisted state.
+        </div>
+
+        <!-- Integrated Demo & USB Serial Control Panel -->
+        <section class="card control-bar-card">
+            <div class="control-bar-inner">
+                <div class="control-group">
+                    <span class="control-label">⚡ Live Simulation Mode:</span>
+                    <button id="btn-toggle-demo" class="btn btn-primary" onclick="toggleDemoStream()">▶️ Start Demo Stream</button>
+                    <button id="btn-gas-surge" class="btn btn-warning" onclick="triggerDemoEvent('gas_surge')">🔥 Gas Surge Alert</button>
+                    <button id="btn-temp-spike" class="btn btn-danger" onclick="triggerDemoEvent('temp_spike')">❄️ Thermal Spike</button>
+                    <button id="btn-normal" class="btn btn-success" onclick="triggerDemoEvent('normal')">🌿 Normal Baseline</button>
+                </div>
+                <div class="control-group serial-group">
+                    <span class="control-label">🔌 Direct USB Bridge:</span>
+                    <select id="serial-port-select" class="select-input">
+                        <option value="COM4" selected>COM4 (ESP32)</option>
+                    </select>
+                    <button id="btn-toggle-serial" class="btn btn-outline" onclick="toggleSerialBridge()">Connect USB (COM4)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Executive Intelligence Scores -->
+        <section class="scores-grid">
+            <!-- Environmental Health Score Card -->
+            <div class="card score-card ehs-card">
+                <div class="card-header">
+                    <h3>Environmental Health Score</h3>
+                    <span id="ehs-coverage" class="chip">100% Coverage</span>
+                </div>
+                <div class="score-body">
+                    <div class="score-circle-container">
+                        <div id="ehs-score-val" class="score-number">--</div>
+                        <div class="score-denom">/ 100</div>
+                    </div>
+                    <div class="score-details">
+                        <div id="ehs-grade-badge" class="grade-badge grade-optimal">CALCULATING</div>
+                        <p id="ehs-reason" class="score-explanation">Awaiting incoming telemetry to synthesize multi-sensor health rating...</p>
+                    </div>
+                </div>
+                <div class="score-subcomponents">
+                    <div class="sub-meter">
+                        <span>Comfort</span>
+                        <div class="bar-bg"><div id="bar-comfort" class="bar-fill" style="width: 0%"></div></div>
+                        <span id="val-comfort" class="sub-val">--</span>
+                    </div>
+                    <div class="sub-meter">
+                        <span>Gas Balance</span>
+                        <div class="bar-bg"><div id="bar-gas" class="bar-fill" style="width: 0%"></div></div>
+                        <span id="val-gas" class="sub-val">--</span>
+                    </div>
+                    <div class="sub-meter">
+                        <span>Lighting</span>
+                        <div class="bar-bg"><div id="bar-light" class="bar-fill" style="width: 0%"></div></div>
+                        <span id="val-light" class="sub-val">--</span>
+                    </div>
+                    <div class="sub-meter">
+                        <span>Noise Index</span>
+                        <div class="bar-bg"><div id="bar-noise" class="bar-fill" style="width: 0%"></div></div>
+                        <span id="val-noise" class="sub-val">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comfort Index Card -->
+            <div class="card score-card comfort-card">
+                <div class="card-header">
+                    <h3>Thermal-Hygric Comfort</h3>
+                    <span id="comfort-status-chip" class="chip chip-info">ASHRAE 55</span>
+                </div>
+                <div class="score-body">
+                    <div class="score-circle-container">
+                        <div id="comfort-score-val" class="score-number">--</div>
+                        <div class="score-denom">/ 100</div>
+                    </div>
+                    <div class="score-details">
+                        <div id="comfort-status-badge" class="grade-badge">PENDING</div>
+                        <p id="comfort-reason" class="score-explanation">Evaluating DHT22 temperature and relative humidity comfort envelope.</p>
+                    </div>
+                </div>
+                <div class="comfort-targets">
+                    <div class="target-box">
+                        <span class="target-label">Target Temp</span>
+                        <span class="target-val">20.0°C – 25.0°C</span>
+                    </div>
+                    <div class="target-box">
+                        <span class="target-label">Target Humidity</span>
+                        <span class="target-val">40.0% – 60.0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Sensor Telemetry Live Cards -->
+        <section class="telemetry-grid">
+            <!-- Card 1: Temperature -->
+            <div class="card sensor-card">
+                <div class="sensor-card-head">
+                    <span class="sensor-name">DHT22 Temperature</span>
+                    <span id="temp-trend-badge" class="trend-badge stable">--</span>
+                </div>
+                <div class="sensor-value-row">
+                    <span id="temp-val" class="sensor-value">--.-</span>
+                    <span class="sensor-unit">°C</span>
+                </div>
+                <div class="sensor-meta">
+                    <span class="meta-item">Rate: <strong id="temp-rate">--</strong></span>
+                    <span class="meta-item">Optimal: <strong>20 - 25°C</strong></span>
+                </div>
+            </div>
+
+            <!-- Card 2: Humidity -->
+            <div class="card sensor-card">
+                <div class="sensor-card-head">
+                    <span class="sensor-name">DHT22 Relative Humidity</span>
+                    <span id="hum-trend-badge" class="trend-badge stable">--</span>
+                </div>
+                <div class="sensor-value-row">
+                    <span id="hum-val" class="sensor-value">--.-</span>
+                    <span class="sensor-unit">%</span>
+                </div>
+                <div class="sensor-meta">
+                    <span class="meta-item">Rate: <strong id="hum-rate">--</strong></span>
+                    <span class="meta-item">Optimal: <strong>40 - 60%</strong></span>
+                </div>
+            </div>
+
+            <!-- Card 3: Light (Bare LDR) -->
+            <div class="card sensor-card">
+                <div class="sensor-card-head">
+                    <span class="sensor-name">Bare LDR Illumination</span>
+                    <span id="light-label-badge" class="chip">--</span>
+                </div>
+                <div class="sensor-value-row">
+                    <span id="light-val" class="sensor-value">----</span>
+                    <span class="sensor-unit">raw ADC</span>
+                </div>
+                <div class="sensor-meta">
+                    <span class="meta-item">Relative: <strong id="light-class-desc">--</strong></span>
+                    <span class="meta-item chip-subtle">Uncalibrated lux</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Gas Response (MQ-135) -->
+            <div class="card sensor-card">
+                <div class="sensor-card-head">
+                    <span class="sensor-name">MQ-135 Gas Response</span>
+                    <span id="mq-status-badge" class="chip chip-warning">Warming up</span>
+                </div>
+                <div class="sensor-value-row">
+                    <span id="mq-val" class="sensor-value">----</span>
+                    <span class="sensor-unit">pin mV</span>
+                </div>
+                <div class="sensor-meta">
+                    <span class="meta-item">Rolling Base: <strong id="mq-baseline-val">-- mV</strong></span>
+                    <span class="meta-item">Ao: <strong id="mq-ao-val">-- mV</strong></span>
+                </div>
+            </div>
+
+            <!-- Card 5: Sound Sensor (LM393) -->
+            <div class="card sensor-card">
+                <div class="sensor-card-head">
+                    <span class="sensor-name">Sound Sensor (LM393)</span>
+                    <span id="sound-do-badge" class="chip">DO: Quiet</span>
+                </div>
+                <div class="sensor-value-row">
+                    <span id="sound-val" class="sensor-value">----</span>
+                    <span class="sensor-unit">swing (150ms)</span>
+                </div>
+                <div class="sensor-meta">
+                    <span class="meta-item">Activity: <strong id="sound-desc">Quiet</strong></span>
+                    <span class="meta-item chip-subtle">Uncalibrated dBA</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Decision Support, Recommendations & Active Alerts -->
+        <section class="insights-grid">
+            <!-- Actionable Recommendations Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>💡 Actionable Recommendations</h3>
+                    <span class="muted-note">Decision Support Engine</span>
+                </div>
+                <div id="recommendations-list" class="recs-container">
+                    <div class="empty-state">Evaluating room conditions...</div>
+                </div>
+            </div>
+
+            <!-- Active Anomaly Alerts Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔔 Anomaly Alerts</h3>
+                    <span id="active-alert-count" class="chip chip-counter">0 Active</span>
+                </div>
+                <div id="alerts-list" class="alerts-container">
+                    <div class="empty-state">No active anomalies detected. Room metrics within threshold bounds.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Trend Forecasting & Projections -->
+        <section class="card forecast-card">
+            <div class="card-header">
+                <h3>📈 Qualified Short-Horizon Forecasts</h3>
+                <span class="chip chip-info">Ordinary Least Squares Projection</span>
+            </div>
+            <div class="forecast-content">
+                <div class="forecast-grid">
+                    <div class="forecast-box">
+                        <h4>Temperature Projection</h4>
+                        <div id="fc-temp-body" class="fc-body">Awaiting sufficient observations...</div>
+                    </div>
+                    <div class="forecast-box">
+                        <h4>Humidity Projection</h4>
+                        <div id="fc-hum-body" class="fc-body">Awaiting sufficient observations...</div>
+                    </div>
+                    <div class="forecast-box">
+                        <h4>MQ-135 Trend Projection</h4>
+                        <div id="fc-mq-body" class="fc-body">Awaiting sufficient observations...</div>
+                    </div>
+                </div>
+                <p class="disclaimer-text">
+                    * <strong>Scientific Qualification:</strong> Projections represent mathematical linear extrapolations of recent verified readings.
+                    They indicate physical rate-of-change trajectory but do not simulate thermodynamic dissipation or chemical dispersion.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 5: Historical Analytics & Graphs -->
+        <section class="card charts-card">
+            <div class="card-header">
+                <h3>📊 Historical Trends & Time-Series</h3>
+                <div class="chart-controls">
+                    <label for="history-limit-select">Points:</label>
+                    <select id="history-limit-select" class="select-input">
+                        <option value="30">Last 30</option>
+                        <option value="60" selected>Last 60</option>
+                        <option value="120">Last 120</option>
+                    </select>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-wrapper">
+                    <h4>Thermal & Humidity History (DHT22)</h4>
+                    <canvas id="chart-thermal"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h4>MQ-135 Gas Response vs Baseline (mV)</h4>
+                    <canvas id="chart-gas"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h4>Ambient Light & Acoustic Activity</h4>
+                    <canvas id="chart-light-sound"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h4>Environmental Health Score History</h4>
+                    <canvas id="chart-ehs"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Measurement Integrity & Sensor Transparency -->
+        <section class="card transparency-card">
+            <div class="card-header">
+                <h3>🛡️ Measurement Integrity & Hardware Contract</h3>
+                <span class="chip chip-success">Hardware Baseline</span>
+            </div>
+            <div class="transparency-grid">
+                <div class="trans-col active-sensors">
+                    <h4>Active Physical & Relative Sensors</h4>
+                    <ul>
+                        <li><strong>DHT22 (GPIO 4):</strong> Real calibrated temperature (°C) & relative humidity (%).</li>
+                        <li><strong>Bare LDR (GPIO 35):</strong> Relative brightness (raw ADC). Classified as Dark (&lt;250), Dim (250–1699), Bright (&ge;1700). <em>Not calibrated lux.</em></li>
+                        <li><strong>MQ-135 (GPIO 34):</strong> Relative gas-response voltage via 10k:20k divider. Compared against rolling baseline. <em>Not ppm, eCO₂, or certified AQI.</em></li>
+                        <li><strong>LM393 Sound (AO 32, DO 26):</strong> Peak-to-peak swing &amp; threshold. <em>Not calibrated sound pressure / dBA.</em></li>
+                    </ul>
+                </div>
+                <div class="trans-col unsupported-sensors">
+                    <h4>Explicitly Unsupported Channels (From Review 1)</h4>
+                    <ul>
+                        <li><strong>Atmospheric Pressure:</strong> BME280 dropped in favor of DHT22. Exposes <span class="mono-text">null</span>.</li>
+                        <li><strong>eCO₂ &amp; TVOC:</strong> ENS160 not present on hardware node. Exposes <span class="mono-text">null</span>.</li>
+                        <li><strong>Certified AQI:</strong> Requires multi-gas calibrated reference apparatus. Exposes <span class="mono-text">null</span>.</li>
+                        <li><strong>Calibrated Lux:</strong> BH1750 not installed; bare LDR voltage divider in use.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Smart Indoor Environmental Intelligence System (SIEIS) • Embedded Systems & Architecture College Project</p>
+        <p class="footer-meta">Connected to SQLite Time-Series Database • Flask REST API • Autonomous Edge Acquisition</p>
+    </footer>
+
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEIS — Room Comfort Index (RCI) Authoritative Specification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for LaTeX Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        :root {
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body {
+            font-family: var(--font-main);
+            line-height: 1.65;
+            color: #1e293b;
+            background: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .report-container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 50px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .btn-print {
+            background: #0284c7;
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);
+            transition: background 0.15s ease;
+        }
+        .btn-print:hover {
+            background: #0369a1;
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+        .nav-link {
+            color: #0284c7;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+        p, li {
+            font-size: 0.95rem;
+            color: #334155;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border: none;
+        }
+        blockquote {
+            border-left: 4px solid #0284c7;
+            background: #f0f9ff;
+            margin: 20px 0;
+            padding: 12px 20px;
+            color: #0369a1;
+            border-radius: 0 8px 8px 0;
+        }
+        blockquote p {
+            margin: 0;
+            color: inherit;
+        }
+        .katex-display {
+            margin: 1.2em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 8px 0;
+        }
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .report-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .top-action-bar {
+                display: none;
+            }
+            pre, blockquote, table {
+                page-break-inside: avoid;
+            }
+            h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="top-action-bar">
+            <div class="nav-links">
+                <a href="/" class="nav-link">&larr; Back to Dashboard</a>
+                <a href="/report" class="nav-link">Comprehensive Report</a>
+            </div>
+            <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        </div>
+
+        <h1 id="sieis-room-comfort-index-rci-authoritative-mathematical-specification">SIEIS Room Comfort Index (RCI) — Authoritative Mathematical Specification</h1>
+<p><strong>Document Identifier:</strong> <code>SIEIS-SPEC-RCI-2026-REV2</code><br />
+<strong>System:</strong> SIEIS (Smart Indoor Environmental Intelligence System)<br />
+<strong>Classification:</strong> Core Intelligence Algorithm &amp; Mathematical Standard<br />
+<strong>Source Implementation:</strong> <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/rci.py"><code>backend/intelligence/rci.py</code></a><br />
+<strong>Configuration Thresholds:</strong> <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/config.py"><code>backend/config.py</code></a>  </p>
+<hr />
+<h2 id="1-executive-summary-design-philosophy">1. Executive Summary &amp; Design Philosophy</h2>
+<p>The <strong>Room Comfort Index (RCI)</strong> is the authoritative, explainable composite index $(0 - 100)$ developed for the Smart Indoor Environmental Intelligence System (SIEIS). It maps multi-modal physical sensor streams into a single, scalar metric representing indoor environmental quality and human comfort.</p>
+<p>Unlike naive unweighted averaging or black-box machine learning models, RCI strictly adheres to the following engineering tenets:</p>
+<ol>
+<li><strong>Standards-Aligned Piecewise Formulations:</strong> Component evaluation curves are grounded in international standards, notably <strong>ASHRAE Standard 55-2023</strong> (Thermal Environmental Conditions for Human Occupancy), <strong>CIBSE Guide A</strong> (Environmental Design), <strong>WHO Air Quality Guidelines</strong>, and indoor ergonomic lighting/acoustics criteria.</li>
+<li><strong>Dynamic Weight Re-Normalization:</strong> If any secondary sensor channel is offline, in a physical warm-up cycle (such as the MQ-135 heater), or unconditioned, the engine dynamically excludes the unready channel and proportionally redistributes its weight across the remaining valid channels without distorting the $0 - 100$ scale.</li>
+<li><strong>Epistemic Honesty:</strong> RCI distinguishes direct physical measurements (DHT22 temperature and relative humidity) from uncalibrated relative indicators (MQ-135 relative gas response, bare LDR brightness, LM393 acoustic swing). Uncalibrated sensors contribute strictly to relative trends, never to fabricated absolute units (such as pseudo-lux, pseudo-dB, or uncalibrated ppm).</li>
+<li><strong>Transparent Explainability:</strong> Every RCI computation outputs not just a numerical score, but exact component sub-scores, active positive/negative contributors, data coverage percentages, and human-readable natural language diagnostic explanations.</li>
+</ol>
+<hr />
+<h2 id="2-mathematical-foundation-dynamic-re-normalization">2. Mathematical Foundation &amp; Dynamic Re-Normalization</h2>
+<p>The Room Comfort Index synthesizes available indoor environmental telemetry using a <strong>dynamically re-normalized weighted multi-attribute synthesis</strong>:</p>
+<p>$$\text{RCI} = \sum_{i \in \mathcal{A}} S_i \times \left( \frac{w_i}{\sum_{j \in \mathcal{A}} w_j} \right)$$</p>
+<p>Where:
+- $\mathcal{A}$ is the set of currently valid, conditioned sensor channels.
+- $S_i \in [0.0, 100.0]$ is the normalized sub-index score for channel $i$.
+- $w_i$ is the nominal weight assigned to channel $i$.
+- $\sum_{j \in \mathcal{A}} w_j$ is the sum of nominal weights of all currently available channels.</p>
+<h3 id="21-nominal-channel-weight-allocations">2.1 Nominal Channel Weight Allocations</h3>
+<p>When all five hardware sensor channels are online, conditioned, and reporting fresh telemetry, the nominal weights are:</p>
+<table>
+<thead>
+<tr>
+<th>Subsystem Channel</th>
+<th>Symbol</th>
+<th>Nominal Weight ($w_i$)</th>
+<th>Percentage</th>
+<th>Primary Reference / Standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Thermal Comfort (Temperature)</strong></td>
+<td>$S_{\text{temp}}$</td>
+<td>$0.30$</td>
+<td><strong>30%</strong></td>
+<td>ASHRAE 55-2023 / CIBSE Guide A</td>
+</tr>
+<tr>
+<td><strong>Hygric Comfort (Humidity)</strong></td>
+<td>$S_{\text{hum}}$</td>
+<td>$0.25$</td>
+<td><strong>25%</strong></td>
+<td>ASHRAE 55 / Sterling Mold Matrix</td>
+</tr>
+<tr>
+<td><strong>Air Freshness (MQ-135 Gas)</strong></td>
+<td>$S_{\text{gas}}$</td>
+<td>$0.25$</td>
+<td><strong>25%</strong></td>
+<td>Relative rolling baseline elevation</td>
+</tr>
+<tr>
+<td><strong>Visual Ergonomics (LDR Brightness)</strong></td>
+<td>$S_{\text{light}}$</td>
+<td>$0.10$</td>
+<td><strong>10%</strong></td>
+<td>CIBSE Code for Lighting / OSHA</td>
+</tr>
+<tr>
+<td><strong>Acoustic Activity (LM393 Sound)</strong></td>
+<td>$S_{\text{sound}}$</td>
+<td>$0.10$</td>
+<td><strong>10%</strong></td>
+<td>WHO Community Noise Guidelines</td>
+</tr>
+<tr>
+<td><strong>Total Nominal Weight</strong></td>
+<td>$\sum w_i$</td>
+<td><strong>$1.00$</strong></td>
+<td><strong>100%</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-re-normalization-example-mq-135-warm-up-state">2.2 Re-Normalization Example (MQ-135 Warm-Up State)</h3>
+<p>During the initial $300\text{s}$ warm-up cycle of the MQ-135 semiconductor heater, or before the 30-sample rolling baseline is established, $S_{\text{gas}}$ is excluded from $\mathcal{A}$:</p>
+<p>$$\mathcal{A} = { \text{temperature}, \text{humidity}, \text{lighting}, \text{sound} }$$</p>
+<p>$$\sum_{j \in \mathcal{A}} w_j = 0.30 + 0.25 + 0.10 + 0.10 = 0.75$$</p>
+<p>The effective weights during warm-up become:
+- Effective Temperature Weight: $\frac{0.30}{0.75} = 40.0\%$
+- Effective Humidity Weight: $\frac{0.25}{0.75} = 33.33\%$
+- Effective Light Weight: $\frac{0.10}{0.75} = 13.33\%$
+- Effective Sound Weight: $\frac{0.10}{0.75} = 13.33\%$</p>
+<p>The result is flagged as <code>is_provisional: True</code> with explicit annotation in the diagnostic explanation.</p>
+<hr />
+<h2 id="3-component-scoring-formulations-s_i">3. Component Scoring Formulations ($S_i$)</h2>
+<p>Every component score $S_i$ outputs a continuous value bounded in $[0.0, 100.0]$.</p>
+<h3 id="31-thermal-comfort-component-s_texttemp">3.1 Thermal Comfort Component ($S_{\text{temp}}$)</h3>
+<p>Derived from the ASHRAE 55 winter/summer combined operative temperature comfort zone for sedentary occupants ($1.0 - 1.2\text{ met}$, $0.5 - 1.0\text{ clo}$).</p>
+<p><strong>Threshold Parameters:</strong>
+- Optimal Min: $T_{\text{opt,min}} = 21.0^\circ\text{C}$
+- Optimal Max: $T_{\text{opt,max}} = 24.0^\circ\text{C}$
+- Absolute Min: $T_{\text{min}} = 14.0^\circ\text{C}$
+- Absolute Max: $T_{\text{max}} = 33.0^\circ\text{C}$</p>
+<p><strong>Piecewise Equation:</strong></p>
+<p>$$S_{\text{temp}}(T) = \begin{cases} 
+100.0 &amp; \text{if } 21.0 \le T \le 24.0 \
+\left( \frac{T - 14.0}{21.0 - 14.0} \right) \times 100.0 &amp; \text{if } 14.0 \le T &lt; 21.0 \
+\left( \frac{33.0 - T}{33.0 - 24.0} \right) \times 100.0 &amp; \text{if } 24.0 &lt; T \le 33.0 \
+0.0 &amp; \text{if } T &lt; 14.0 \text{ or } T &gt; 33.0
+\end{cases}$$</p>
+<pre><code class="language-text">Score
+ 100 |          +--------------------+
+     |         /                      \
+     |        /                        \
+     |       /                          \
+   0 +------+----------------------------+------
+           14.0 21.0                24.0 33.0    Temperature (°C)
+</code></pre>
+<hr />
+<h3 id="32-hygric-comfort-component-s_texthum">3.2 Hygric Comfort Component ($S_{\text{hum}}$)</h3>
+<p>Aligned with the Sterling Criteria for human respiratory health, mucosal comfort, electrostatic discharge prevention, and mold spore germination limits.</p>
+<p><strong>Threshold Parameters:</strong>
+- Optimal Min: $\text{RH}<em>{\text{opt,min}} = 40.0\%$
+- Optimal Max: $\text{RH}</em>{\text{opt,max}} = 60.0\%$
+- Absolute Min: $\text{RH}<em>{\text{min}} = 15.0\%$
+- Absolute Max: $\text{RH}</em>{\text{max}} = 85.0\%$</p>
+<p><strong>Piecewise Equation:</strong></p>
+<p>$$S_{\text{hum}}(\text{RH}) = \begin{cases} 
+100.0 &amp; \text{if } 40.0 \le \text{RH} \le 60.0 \
+\left( \frac{\text{RH} - 15.0}{40.0 - 15.0} \right) \times 100.0 &amp; \text{if } 15.0 \le \text{RH} &lt; 40.0 \
+\left( \frac{85.0 - \text{RH}}{85.0 - 60.0} \right) \times 100.0 &amp; \text{if } 60.0 &lt; \text{RH} \le 85.0 \
+0.0 &amp; \text{if } \text{RH} &lt; 15.0 \text{ or } \text{RH} &gt; 85.0
+\end{cases}$$</p>
+<pre><code class="language-text">Score
+ 100 |          +--------------------+
+     |         /                      \
+     |        /                        \
+     |       /                          \
+   0 +------+----------------------------+------
+           15.0 40.0                60.0 85.0    Relative Humidity (%)
+</code></pre>
+<hr />
+<h3 id="33-volatile-gas-baseline-response-s_textgas">3.3 Volatile Gas Baseline Response ($S_{\text{gas}}$)</h3>
+<p>The MQ-135 is a broad-spectrum metal-oxide semiconductor (MOS) sensor that responds to reducing and oxidisable gases ($\text{CO}_2$, $\text{CO}$, ethanol, ammonia, toluene, acetone). Because it lacks factory calibration and suffers from long-term sensor drift, SIEIS computes a dynamic <strong>Elevation Ratio</strong> against a rolling baseline rather than asserting uncalibrated ppm:</p>
+<p>$$R_{\text{ratio}} = \frac{V_{\text{pin}}}{V_{\text{baseline}}}$$</p>
+<p>Where $V_{\text{baseline}}$ is maintained by the <code>MQ135BaselineManager</code> using a 30-sample sliding window with a $20\%$ symmetric trimmed mean to filter transient spikes.</p>
+<p><strong>Threshold Parameters:</strong>
+- Clean Threshold: $R_{\text{clean}} = 1.05$ (Sensor within $\le 5\%$ of ambient rolling baseline)
+- Contamination Limit: $R_{\text{max}} = 2.50$ (Sensor voltage elevated $\ge 150\%$ above baseline)</p>
+<p><strong>Piecewise Equation:</strong></p>
+<p>$$S_{\text{gas}}(R) = \begin{cases} 
+100.0 &amp; \text{if } R \le 1.05 \
+\left( 1.0 - \frac{R - 1.05}{2.50 - 1.05} \right) \times 100.0 &amp; \text{if } 1.05 &lt; R &lt; 2.50 \
+0.0 &amp; \text{if } R \ge 2.50
+\end{cases}$$</p>
+<pre><code class="language-text">Score
+ 100 | +---------+
+     |            \
+     |             \
+     |              \
+   0 +---------------+------------------
+     0.0        1.05 2.50               Ratio (V_pin / V_baseline)
+</code></pre>
+<blockquote>
+<p>[!NOTE]
+If the sensor is in pre-heat phase (<code>mq135_status != "ready"</code>), or $V_{\text{baseline}} \le 0$, $S_{\text{gas}}$ returns <code>None</code>, activating the dynamic weight redistribution.</p>
+</blockquote>
+<hr />
+<h3 id="34-visual-ergonomics-component-s_textlight">3.4 Visual Ergonomics Component ($S_{\text{light}}$)</h3>
+<p>The ambient light sensor consists of a bare Light Dependent Resistor (LDR) in a voltage-divider circuit with a $10\text{ k}\Omega$ resistor to GND on ESP32 GPIO 35 (12-bit ADC, $0 - 4095$). Higher ADC counts represent higher ambient brightness.</p>
+<p><strong>Empirically Calibrated Classification:</strong>
+- $\text{ADC} &lt; 250$: <code>Dark</code> (Night / blinds closed / lights off)
+- $250 \le \text{ADC} &lt; 1700$: <code>Dim</code> (Comfortable indoor ambient lighting / shaded daytime)
+- $\text{ADC} \ge 1700$: <code>Bright</code> (Direct office lighting / sunlight ingress / task illumination)</p>
+<p><strong>Scoring Assignment:</strong></p>
+<p>$$S_{\text{light}} = \begin{cases} 
+100.0 &amp; \text{if } \text{ADC} \ge 1700 \quad (\text{Optimal working illumination}) \
+85.0 &amp; \text{if } 250 \le \text{ADC} &lt; 1700 \quad (\text{Acceptable background light}) \
+50.0 &amp; \text{if } \text{ADC} &lt; 250 \quad (\text{Dark / insufficient for reading})
+\end{cases}$$</p>
+<p><em>Labeling Guard: Never labeled as calibrated illuminance (Lux).</em></p>
+<hr />
+<h3 id="35-acoustic-disturbance-component-s_textsound">3.5 Acoustic Disturbance Component ($S_{\text{sound}}$)</h3>
+<p>Monitored via the LM393 microphone module on ESP32 GPIO 32 (Analog peak-to-peak swing over a $50\text{ ms}$ sampling window) and GPIO 26 (Digital comparator trigger $\text{DO}$).</p>
+<p><strong>Threshold Parameters:</strong>
+- Peak-to-peak ADC swing $&lt; 400$: <code>Quiet</code> (Normal residential/office background)
+- Peak-to-peak ADC swing $400 - 1199$: <code>Moderate</code> (Conversational activity / keyboard typing)
+- Peak-to-peak ADC swing $\ge 1200$ or $\text{DO} = 1$: <code>Noisy / Disturbed</code> (Impulse noises, loud alarms, loud speech)</p>
+<p><strong>Scoring Assignment:</strong></p>
+<p>$$S_{\text{sound}} = \begin{cases} 
+100.0 &amp; \text{if } \text{Swing} &lt; 400 \text{ and } \text{DO} = 0 \quad (\text{Serene / quiet environment}) \
+80.0 &amp; \text{if } 400 \le \text{Swing} &lt; 1200 \text{ and } \text{DO} = 0 \quad (\text{Moderate acceptable noise}) \
+40.0 &amp; \text{if } \text{Swing} \ge 1200 \text{ or } \text{DO} = 1 \quad (\text{Acoustic disruption})
+\end{cases}$$</p>
+<p><em>Labeling Guard: Never labeled as calibrated decibels (dB or dBA).</em></p>
+<hr />
+<h2 id="4-operational-guards-coverage-freshness">4. Operational Guards, Coverage &amp; Freshness</h2>
+<p>To prevent misleading comfort indices from faulty hardware or broken telemetry connections, the engine enforces three strict operational guards:</p>
+<h3 id="41-mandatory-core-inputs-guard">4.1 Mandatory Core Inputs Guard</h3>
+<p>Temperature and Relative Humidity from the DHT22 are mandatory. If either is <code>None</code>, NaN, or physically out-of-bounds:
+- <strong>Output:</strong> <code>score: None</code>
+- <strong>Status:</strong> <code>Indeterminate</code>
+- <strong>Reason:</strong> <code>"Core temperature and relative humidity inputs are required for RCI."</code></p>
+<h3 id="42-data-coverage-guard">4.2 Data Coverage Guard</h3>
+<p>Data coverage is evaluated as the proportion of active nominal weights:</p>
+<p>$$\text{Coverage } (\%) = \left( \frac{\sum_{i \in \mathcal{A}} w_i}{\sum_{j \in \text{All}} w_j} \right) \times 100.0$$</p>
+<ul>
+<li>Minimum Required Coverage: <strong>$50.0\%$</strong> (<code>Config.RCI_MIN_COVERAGE_PCT</code>).</li>
+<li>If Coverage $&lt; 50.0\%$, calculation aborts with <code>Indeterminate</code>.</li>
+</ul>
+<h3 id="43-telemetry-freshness-guard">4.3 Telemetry Freshness Guard</h3>
+<ul>
+<li>Telemetry Staleness Threshold: <strong>$120\text{ seconds}$</strong> (<code>Config.RCI_STALE_THRESHOLD_SECONDS</code>).</li>
+<li>If the time elapsed since the latest sensor observation exceeds $120\text{s}$, the calculation returns <code>is_stale: True</code>, holding the status as <code>Indeterminate / Stale</code> and displaying the exact elapsed staleness age.</li>
+</ul>
+<hr />
+<h2 id="5-classification-bands-explainability-outputs">5. Classification Bands &amp; Explainability Outputs</h2>
+<h3 id="51-comfort-classification-bands">5.1 Comfort Classification Bands</h3>
+<table>
+<thead>
+<tr>
+<th>Score Range</th>
+<th>Comfort Status</th>
+<th>UI Color Band</th>
+<th>Operational Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>$80.0 \le \text{RCI} \le 100.0$</strong></td>
+<td><strong>Optimal / Comfortable</strong></td>
+<td><code>Green</code></td>
+<td>Indoor conditions are optimal; no intervention needed.</td>
+</tr>
+<tr>
+<td><strong>$50.0 \le \text{RCI} &lt; 80.0$</strong></td>
+<td><strong>Moderate / Needs Attention</strong></td>
+<td><code>Yellow</code></td>
+<td>One or more parameters are sub-optimal; consult recommendations.</td>
+</tr>
+<tr>
+<td><strong>$0.0 \le \text{RCI} &lt; 50.0$</strong></td>
+<td><strong>Poor / Uncomfortable</strong></td>
+<td><code>Red</code></td>
+<td>Acute environmental degradation; active remediation advised.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-contributor-attribution-rules">5.2 Contributor Attribution Rules</h3>
+<ul>
+<li><strong>Positive Contributors:</strong> Any valid channel where $S_i \ge 80.0$ is added to <code>main_positive_contributors</code> (e.g., <code>"Temperature (100.0%)"</code>, <code>"Sound (100.0%)"</code>).</li>
+<li><strong>Negative Contributors:</strong> Any valid channel where $S_i &lt; 70.0$ is added to <code>main_negative_contributors</code> (e.g., <code>"Gas_response (45.2%)"</code>).</li>
+<li><strong>Confidence Rating:</strong></li>
+<li><code>High</code>: Data coverage $\ge 90\%$ and not provisional.</li>
+<li><code>Moderate</code>: Data coverage $\ge 60\%$.</li>
+<li><code>Low</code>: Data coverage $&lt; 60\%$.</li>
+</ul>
+<hr />
+<h2 id="6-worked-step-by-step-calculation-examples">6. Worked Step-by-Step Calculation Examples</h2>
+<h3 id="example-1-nominal-office-environment-all-channels-active">Example 1: Nominal Office Environment (All Channels Active)</h3>
+<p><strong>Inputs:</strong>
+- $T = 22.5^\circ\text{C}$
+- $\text{RH} = 50.0\%$
+- $V_{\text{pin}} = 280\text{ mV}$, $V_{\text{baseline}} = 275\text{ mV}$ ($R = 1.018$, status ready)
+- $\text{LDR ADC} = 1850$
+- $\text{Sound Swing} = 220$, $\text{DO} = 0$</p>
+<p><strong>Component Scores:</strong>
+- $S_{\text{temp}} = 100.0$ (Inside $[21.0, 24.0]^\circ\text{C}$)
+- $S_{\text{hum}} = 100.0$ (Inside $[40.0, 60.0]\%$)
+- $S_{\text{gas}} = 100.0$ ($R = 1.018 \le 1.05$)
+- $S_{\text{light}} = 100.0$ ($\text{ADC} = 1850 \ge 1700$)
+- $S_{\text{sound}} = 100.0$ ($\text{Swing} = 220 &lt; 400$)</p>
+<p>$$\text{RCI} = (100.0 \times 0.30) + (100.0 \times 0.25) + (100.0 \times 0.25) + (100.0 \times 0.10) + (100.0 \times 0.10) = \mathbf{100.0}$$
+- <strong>Status:</strong> <code>Optimal / Comfortable</code> (Green)
+- <strong>Coverage:</strong> $100.0\%$ | <strong>Confidence:</strong> High</p>
+<hr />
+<h3 id="example-2-warm-afternoon-with-stale-air">Example 2: Warm Afternoon with Stale Air</h3>
+<p><strong>Inputs:</strong>
+- $T = 28.5^\circ\text{C}$ (Warm)
+- $\text{RH} = 68.0\%$ (Humid)
+- $V_{\text{pin}} = 450\text{ mV}$, $V_{\text{baseline}} = 300\text{ mV}$ ($R = 1.50$, status ready)
+- $\text{LDR ADC} = 950$ (Dim)
+- $\text{Sound Swing} = 310$, $\text{DO} = 0$ (Quiet)</p>
+<p><strong>Component Scores:</strong>
+- $S_{\text{temp}} = \frac{33.0 - 28.5}{33.0 - 24.0} \times 100.0 = \frac{4.5}{9.0} \times 100.0 = \mathbf{50.0}$
+- $S_{\text{hum}} = \frac{85.0 - 68.0}{85.0 - 60.0} \times 100.0 = \frac{17.0}{25.0} \times 100.0 = \mathbf{68.0}$
+- $S_{\text{gas}} = \left( 1.0 - \frac{1.50 - 1.05}{2.50 - 1.05} \right) \times 100.0 = \left( 1.0 - \frac{0.45}{1.45} \right) \times 100.0 = (1.0 - 0.3103) \times 100.0 = \mathbf{69.0}$
+- $S_{\text{light}} = \mathbf{85.0}$
+- $S_{\text{sound}} = \mathbf{100.0}$</p>
+<p><strong>Synthesis:</strong>
+$$\text{RCI} = (50.0 \times 0.30) + (68.0 \times 0.25) + (69.0 \times 0.25) + (85.0 \times 0.10) + (100.0 \times 0.10)$$
+$$\text{RCI} = 15.0 + 17.0 + 17.25 + 8.5 + 10.0 = \mathbf{67.75} \approx \mathbf{67.8}$$
+- <strong>Status:</strong> <code>Moderate / Needs Attention</code> (Yellow)
+- <strong>Negative Contributors:</strong> Temperature (50.0%), Humidity (68.0%), Gas Response (69.0%)
+- <strong>Positive Contributors:</strong> Sound (100.0%), Lighting (85.0%)</p>
+<hr />
+<h3 id="example-3-initial-boot-warm-up-4-channels-active">Example 3: Initial Boot Warm-Up (4 Channels Active)</h3>
+<p><strong>Inputs:</strong>
+- $T = 23.0^\circ\text{C}$ ($S_{\text{temp}} = 100.0$)
+- $\text{RH} = 45.0\%$ ($S_{\text{hum}} = 100.0$)
+- MQ-135 status: <code>warming_up</code> ($S_{\text{gas}} = \text{None}$)
+- $\text{LDR ADC} = 2100$ ($S_{\text{light}} = 100.0$)
+- $\text{Sound Swing} = 150$ ($S_{\text{sound}} = 100.0$)</p>
+<p><strong>Dynamic Normalization:</strong>
+- Active Weight Sum: $0.30 + 0.25 + 0.10 + 0.10 = 0.75$
+- Coverage: $\frac{0.75}{1.00} \times 100.0 = \mathbf{75.0\%}$</p>
+<p>$$\text{RCI} = 100.0 \times \frac{0.30}{0.75} + 100.0 \times \frac{0.25}{0.75} + 100.0 \times \frac{0.10}{0.75} + 100.0 \times \frac{0.10}{0.75} = \mathbf{100.0}$$
+- <strong>Status:</strong> <code>Optimal / Comfortable</code> (Green)
+- <strong>Flags:</strong> <code>is_provisional: True</code>, <code>Confidence: Moderate</code>
+- <strong>Explanation:</strong> <code>"Thermal: 100.0% (23.0°C); Hygric: 100.0% (45.0%); Gas: [Excluded - Warmup/Baseline Unconditioned]"</code></p>
+<hr />
+<h2 id="7-architecture-code-traceability">7. Architecture &amp; Code Traceability</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>File / Module</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Core Computation</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/rci.py"><code>backend/intelligence/rci.py</code></a></td>
+<td>Defines <code>RoomComfortIndexEngine</code> and <code>calculate_rci()</code>. Implements all piecewise curves and guards.</td>
+</tr>
+<tr>
+<td><strong>System Thresholds</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/config.py"><code>backend/config.py</code></a></td>
+<td>Defines <code>RCI_WEIGHT_*</code>, <code>RCI_TEMP_*</code>, <code>RCI_HUM_*</code>, <code>RCI_GAS_*</code>, and <code>RCI_STALE_THRESHOLD_SECONDS</code>.</td>
+</tr>
+<tr>
+<td><strong>Database Persistence</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/database.py"><code>backend/database.py</code></a></td>
+<td>Stores calculated RCI scores into SQLite table <code>comfort_scores</code> with timestamps and observation foreign keys.</td>
+</tr>
+<tr>
+<td><strong>REST API Route</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/app.py"><code>backend/app.py</code></a></td>
+<td>Exposes <code>GET /api/comfort-index</code> returning complete RCI schema with no-cache headers.</td>
+</tr>
+<tr>
+<td><strong>Frontend Presentation</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/static/js/app.js"><code>backend/static/js/app.js</code></a></td>
+<td>Function <code>updateRCIHero()</code> dynamically updates hero score, status pill, color band, progress rings, and contributor factors.</td>
+</tr>
+<tr>
+<td><strong>Verification Suite</strong></td>
+<td><a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/tests/test_rci.py"><code>tests/test_rci.py</code></a></td>
+<td>Automated unit tests verifying piecewise boundary transitions, dynamic weight redistribution, coverage guards, and staleness handling.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Authored by: SIEIS Embedded Intelligence Architecture Group</em><br />
+<em>Document Revision: 2.0.0 | Verified against live firmware &amp; backend test suite (71 passing tests).</em></p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1291 @@
+<USER_REQUEST>
+# MASTER IMPLEMENTATION SPECIFICATION: SIEIS (Smart Indoor Environmental Intelligence System)
+## Full-Stack Intelligence, Regression Preservation & Zero-Scroll Dashboard
+
+## 1. ROLE & EXECUTION MANDATE
+
+Act as a Principal Software Architect, Embedded IoT Systems Engineer, Environmental Data Scientist, Full-Stack Python/Frontend Engineer, UX Designer, and QA Test Architect.
+
+Your task is to **inspect, preserve, extend, redesign, and thoroughly test** the existing **SIEIS (Smart Indoor Environmental Intelligence System)** project in your current workspace.
+
+- **DO NOT** reply with a high-level summary, plan-only outline, or isolated code snippets.
+- **DO NOT** rebuild the entire project blindly from scratch or delete existing working firmware, USB serial bridges, SQLite history, charts, or forecasting features.
+- **EXECUTE** the complete implementation directly inside the workspace following every hardware constraint, mathematical rule, API contract, zero-scroll layout requirement, electrical safety guideline, and testing standard specified below.
+
+---
+
+## 2. PROJECT IDENTITY, CORE OBJECTIVES & SOURCE-OF-TRUTH HIERARCHY
+
+**Project:** SIEIS — Smart Indoor Environmental Intelligence System (Embedded Systems & Architecture project).
+
+**Core Architecture — Preserve All Four Pillars:**
+
+1. **Monitor:** Acquire environmental readings via ESP32 sensors, validate inputs, and expose accurate sensor and readiness status.
+2. **Transmit:** Send validated telemetry to the laptop via USB Serial Bridge and/or Wi-Fi HTTP JSON packets.
+3. **Analyze:** Compute an authoritative Room Comfort Index (RCI, 0–100), calculate experimental indoor PM2.5 and CO₂ estimates, fetch live outdoor weather and AQI from the web, compare indoor and outdoor conditions, track historical trends, analyze anomalies, and support forecasting horizons including +5, +10 and +15 minutes.
+4. **Decide:** Run an explainable, rule-based diagnostic engine that identifies what is wrong, what metric needs improvement, and what actionable solution the user should take based on combined indoor and outdoor context.
+
+### Source-of-Truth and Conflict Resolution
+
+1. **Workspace audit first:** Before editing code, inspect the existing ESP32 firmware, Flask routes, SQLite database schemas, intelligence modules, USB serial scripts, HTML/CSS/JavaScript frontend, configuration files, documentation and automated tests.
+
+2. **Actual hardware governs:** If the original Review 1 presentation mentions sensors that are not present in the actual hardware configuration below, the actual hardware section takes precedence.
+
+3. **Separate telemetry health states:** The Flask server at `http://localhost:5000` and direct USB bridge using COM4 were previously observed to respond to physical sensor changes, while screenshots showed a network/server offline or stale-telemetry warning on the Wi-Fi HTTP path. A prior engineering report stated that 31 automated software tests passed, but this must be reverified.
+
+   Never assume USB Serial, Wi-Fi HTTP POST, Flask, SQLite and the outdoor API share one health state. Expose separate, honest status indicators:
+
+   - `usb_bridge_status`
+   - `wifi_http_telemetry_status`
+   - `backend_server_status`
+   - `database_status`
+   - `outdoor_api_status`
+
+4. **Epistemic honesty:** Never claim the ESP32 is connected over Wi-Fi merely because Flask is running. Never fabricate readings, calibration datasets or test results.
+
+---
+
+## 3. ACTUAL HARDWARE CONFIGURATION, ELECTRICAL SAFETY AND MEASUREMENT BOUNDARIES
+
+### 3.1 Verified Hardware and GPIO Pinout
+
+Preserve existing verified sensor acquisition, calibration logic and GPIO assignments. **Do not alter physical circuit wiring or pins without explicit approval.**
+
+| Component | Role | GPIO / configuration | Limitation |
+|---|---|---|---|
+| ESP32 DevKit with CP2102 | Controller, ADC, Wi-Fi and USB Serial | COM4 previously used; keep configurable or auto-detected | COM port may change; ADC is nonlinear near extremes |
+| DHT22 | Indoor temperature and relative humidity | GPIO 4 | Subject to sensor accuracy and placement |
+| MQ-135 gas sensor | Relative gas-response signal and baseline trend | GPIO 34 through voltage divider | Requires approximately 24–48 hours of burn-in; not a calibrated CO₂, TVOC or AQI sensor |
+| Bare LDR | Relative ambient brightness | GPIO 35; LDR to 3.3 V and 10 kΩ resistor from the junction to GND | Higher ADC means brighter; not a calibrated lux meter |
+| LM393-labelled sound module | Analog sound swing and digital threshold | GPIO 32 analog output, GPIO 26 digital output | Not a calibrated dB/dBA meter |
+
+### 3.2 Electrical Safety and Circuit Verification
+
+- Never connect a 5 V sensor output or unconditioned high-voltage signal directly to an ESP32 input.
+- Inspect and verify the physical MQ-135 voltage-divider wiring and its conversion ratio before relying on derived sensor voltage.
+- Do not assume the exact divider ratio merely from previous notes.
+- Do not alter physical circuits, GPIO assignments or sensor wiring without explicit approval.
+- Preserve the existing working firmware and sensor acquisition behaviour unless a verified defect requires correction and the proposed change is safe.
+
+### 3.3 Verified LDR Calibration and Thresholds
+
+Preserve the verified circuit polarity: higher ADC counts correspond to higher brightness.
+
+Empirical observations:
+
+- Covered LDR: approximately 25.
+- Normal room lighting: approximately 500.
+- Phone torch: approximately 2985.
+
+Classification thresholds:
+
+- ADC below 250: `Dark`.
+- ADC from 250 through 1699: `Dim`.
+- ADC at or above 1700: `Bright`.
+
+These classifications indicate relative brightness, not calibrated illuminance.
+
+### 3.4 Unsupported Direct Measurements
+
+The current hardware does not directly measure:
+
+- Indoor PM2.5 or PM10.
+- Calibrated indoor CO₂ or eCO₂.
+- Indoor TVOC.
+- Indoor regulatory AQI.
+- Calibrated illuminance in lux.
+- Calibrated sound pressure in dB/dBA.
+- Atmospheric pressure in hPa.
+
+Mandatory labelling rules:
+
+1. Never label LDR ADC readings as lux.
+2. Never label LM393 readings as dB or dBA.
+3. Never label raw MQ-135 voltage or ADC as direct ppm or indoor AQI.
+4. Display experimental indoor PM2.5 and CO₂ estimates only with a prominent `EXPERIMENTAL ESTIMATE` label, limitations, confidence wording and calibration status.
+5. Outdoor AQI must come from the online API, never be inferred from indoor sensors.
+6. Never describe an estimate as a direct sensor measurement.
+
+---
+
+## 4. PRESERVATION OF EXISTING FUNCTIONALITY AND REGRESSION TESTING
+
+Retain and regression-test existing working functionality, including:
+
+- Sensor telemetry.
+- USB serial bridge.
+- Wi-Fi HTTP ingestion.
+- SQLite history and database schema.
+- Existing API endpoints.
+- Historical charts and trend graphs.
+- Forecasting models, including +5-, +10- and +15-minute horizons if implemented.
+- Alert logs.
+- Recommendation history.
+- MQ-135 baseline analysis.
+- Anomaly-detection functionality.
+- Existing frontend and backend integrations.
+- Current firmware behaviour and configuration.
+
+Redesign the visual presentation without silently removing working capabilities.
+
+Determine where each retained feature belongs within the two primary tabs or an unobtrusive, accessible detail drawer, modal or popover.
+
+Before modifying an existing component, identify its current behaviour and dependencies. Reuse functional code where appropriate instead of recreating it unnecessarily.
+
+Run the existing tests before and after modifications when feasible. Do not delete or weaken existing tests just to make the suite pass.
+
+---
+
+## 5. STRICT ZERO-SCROLL FRONTEND REDESIGN
+
+Redesign the web dashboard into a modern, engineering-grade, responsive bento-box interface that fits the intended information into a single viewport without vertical or horizontal page scrolling.
+
+### 5.1 Fixed-Viewport Constraints
+
+Use a root layout equivalent to:
+
+- `width: 100vw`
+- `height: 100vh`
+- `height: 100dvh`
+- `overflow: hidden`
+- `margin: 0`
+- `padding: 0`
+- `box-sizing: border-box`
+
+Use CSS Grid and Flexbox. The top header should occupy approximately 48–56 px, with the active tab filling the remaining viewport height.
+
+Apply `min-width: 0` and `min-height: 0` to relevant grid and flex children.
+
+Do not merely hide overflowing content. Resize and rearrange cards, use fluid typography with `clamp()`, compact spacing and concise labels so that all primary information remains readable.
+
+Secondary information, including coordinate configuration, detailed formulas and historical charts, may open in a clean modal, popover or dedicated detail pane.
+
+### 5.2 Required Test Viewports
+
+Verify both tabs at:
+
+- `1366 × 768`
+- `1440 × 900`
+- `1920 × 1080`
+- `390 × 844`
+
+For the desktop viewports, test:
+
+- `document.documentElement.scrollHeight <= window.innerHeight`
+- `document.documentElement.scrollWidth <= window.innerWidth`
+
+Also verify no overlapping cards, cut-off values or browser-console errors.
+
+On mobile, stack bento cards into a responsive layout with touch-friendly navigation and no horizontal overflow or clipped text. Test whether the primary information remains accessible and readable. Do not falsely claim the page is scroll-free merely because overflow has been hidden.
+
+### 5.3 Header and Primary Tabs
+
+Create a compact persistent header containing:
+
+- SIEIS branding and a short subtitle.
+- Two accessible tabs.
+- Separate subsystem status indicators.
+- A live telemetry-age indicator.
+- A location-settings control.
+
+The two tabs must be:
+
+1. **Overview** — default tab.
+2. **Recommendations & Diagnostics** — includes an active-alert count.
+
+Implement accessible tab semantics with `role="tablist"`, keyboard navigation using ArrowLeft and ArrowRight, and visible `:focus-visible` indicators.
+
+Switch tabs without a full-page reload.
+
+Display distinct statuses for USB bridge, Wi-Fi telemetry, backend, outdoor API and latest sensor telemetry. Do not conflate these states.
+
+Provide a location-settings modal or popover to configure latitude, longitude and location label.
+
+---
+
+## 6. OVERVIEW TAB
+
+Fit the following content into the fixed viewport using a carefully prioritised layout.
+
+### 6.1 Room Comfort Index Hero Card
+
+Create a prominent circular SVG gauge or radial dial displaying the backend RCI score from 0 to 100.
+
+Required score bands:
+
+| Score | Status | Colour |
+|---|---|---|
+| 80–100 | Optimal / Comfortable | Green |
+| 50–79 | Moderate / Needs Attention | Yellow/orange |
+| 0–49 | Poor / Uncomfortable | Red |
+
+Display:
+
+- Score or an explicit indeterminate state.
+- Status badge.
+- Main positive and negative contributing factors.
+- Data coverage percentage.
+- Confidence level.
+- Calculation timestamp.
+- Provisional or stale-data warning.
+
+### 6.2 Measured Indoor Sensor Cards
+
+**Temperature**
+
+- DHT22 temperature in °C.
+- Target band of 21–24 °C.
+- Readiness or freshness status.
+
+**Relative humidity**
+
+- DHT22 relative humidity in percent.
+- Target band of 40–60%.
+- Calculated dew point and/or absolute humidity when inputs are valid.
+
+**LDR brightness**
+
+- Raw ADC count, nominally 0–4095.
+- Relative brightness indicator.
+- `Dark`, `Dim` or `Bright` threshold badge.
+- Explicit label: `Relative Brightness — Not Lux`.
+
+**MQ-135 gas signal**
+
+- Raw ADC.
+- Pin voltage in mV.
+- Baseline-relative ratio or percentage change when the baseline is valid.
+- Baseline readiness or warm-up/burn-in status.
+- Explicit label: `Relative Gas Signal`.
+
+**Sound activity**
+
+- Analog sound-swing value.
+- Digital trigger state.
+- Short-term persistence.
+- Explicit label: `Relative Sound Swing — Not dB`.
+
+### 6.3 Experimental Indoor Estimates
+
+**Experimental Indoor PM2.5**
+
+Display:
+
+- Numeric estimate when sufficient valid inputs exist.
+- Unit in µg/m³.
+- Prominent `EXPERIMENTAL ESTIMATE` badge.
+- Method and model version.
+- Confidence or uncertainty wording.
+- Calibration status.
+- Timestamp.
+- Concise limitation notice.
+
+**Experimental Indoor CO₂**
+
+Display:
+
+- Numeric estimate in ppm when the configured heuristic has sufficient valid inputs.
+- Prominent `EXPERIMENTAL ESTIMATE` badge.
+- Method and model version.
+- Confidence or uncertainty wording.
+- Calibration status.
+- Timestamp.
+- Concise limitation notice.
+
+If the estimator cannot generate a meaningful result, display `Unavailable` or `Insufficient data`, not a fabricated number.
+
+### 6.4 Live Outdoor Weather and AQI
+
+Display outdoor information retrieved from the configured online API.
+
+**Outdoor AQI**
+
+- Current numeric AQI.
+- Explicit AQI scale: `US AQI` or `European AQI`.
+- Correct category for that scale.
+- Provider attribution.
+- Observation/model timestamp.
+- Last-refresh timestamp.
+- Freshness status: Live, Cached, Stale or Offline.
+
+Never present outdoor AQI as indoor AQI.
+
+**Outdoor weather**
+
+- Outdoor temperature in °C.
+- Outdoor relative humidity in percent.
+- Timestamp and freshness metadata.
+
+Outdoor PM2.5 and PM10 may be displayed if returned by the configured API, but are optional supplemental fields rather than mandatory features.
+
+### 6.5 Indoor-versus-Outdoor Comparison
+
+**Temperature delta**
+
+Calculate:
+
+`delta_temperature_c = indoor_temperature_c - outdoor_temperature_c`
+
+Show indoor temperature, outdoor temperature, delta and whether outdoor air is cooler or warmer.
+
+Do not claim that temperature delta proves insulation performance.
+
+**Humidity delta**
+
+Calculate:
+
+`delta_relative_humidity_pp = indoor_rh_percent - outdoor_rh_percent`
+
+Label the difference in percentage points (`pp`).
+
+Also calculate dew point or absolute humidity when the required temperature and relative humidity readings are valid.
+
+**Air-quality context**
+
+Present separately:
+
+- Indoor MQ-135 baseline-relative status.
+- Experimental indoor PM2.5 estimate.
+- Experimental indoor CO₂ estimate.
+- Outdoor AQI and its specific scale.
+- Optional online outdoor PM2.5/PM10 when available.
+
+Never compare incompatible units using arbitrary ratios or differences.
+
+**Ventilation favourability**
+
+Display one of:
+
+- `Favourable`
+- `Unfavourable`
+- `Mixed`
+- `Indeterminate`
+
+Include a short explanation of the decision and the freshness or uncertainty of the supporting data.
+
+### 6.6 Historical and Forecasting Widget
+
+Preserve current historical charts, anomaly information, trend graphs and forecasts.
+
+Use a compact chart or a clearly accessible detail control. Retain the existing +5-, +10- and +15-minute forecasting horizons wherever implemented.
+
+Do not remove existing historical functionality merely to make room for new cards.
+
+---
+
+## 7. RECOMMENDATIONS & DIAGNOSTICS TAB
+
+This tab must also fit the intended viewport and avoid unnecessary scrolling.
+
+### 7.1 Highest-Priority Issue Card
+
+Display:
+
+- What is wrong.
+- Which metric requires attention.
+- Current value versus target or threshold.
+- Recommended action.
+- Supporting indoor evidence.
+- Supporting outdoor context.
+- Explanation of why the recommendation was generated.
+- Measurement and estimation limitations.
+
+Prioritise the most relevant current issue.
+
+### 7.2 Secondary Active Issues
+
+Display other active recommendations in a compact grid or list.
+
+Use severity ordering:
+
+`critical > warning > advisory > info`
+
+Avoid duplicate cards for the same unresolved issue.
+
+Preserve historical recommendation and alert information in SQLite and make it accessible through the UI or a detail view.
+
+### 7.3 Diagnostics Matrix
+
+Display separate health indicators for:
+
+- USB Serial connection.
+- Wi-Fi HTTP telemetry.
+- Backend server.
+- SQLite persistence.
+- DHT22 readings.
+- MQ-135 warm-up and baseline readiness.
+- Experimental estimator readiness.
+- Outdoor API connectivity and cache age.
+- RCI input coverage.
+
+The UI must distinguish operational errors from environmental conditions.
+
+A missing API response must not produce a false environmental warning.
+
+---
+
+## 8. AUTHORITATIVE ROOM COMFORT INDEX ENGINE
+
+Implement one authoritative backend RCI calculation. Do not duplicate or override the formula in frontend JavaScript.
+
+All component weights and threshold settings must be configurable.
+
+### 8.1 Overall formula
+
+Let:
+
+\[
+\mathrm{RCI}=\sum_i w_i s_i
+\]
+
+where the active weights \(w_i\) are normalised and component scores \(s_i\) fall in the range 0–100.
+
+Initial weights:
+
+| Component | Weight |
+|---|---:|
+| Temperature | 0.30 |
+| Relative humidity | 0.25 |
+| MQ-135 relative gas response | 0.25 |
+| LDR brightness | 0.10 |
+| Sound activity | 0.10 |
+
+Inspect existing RCI/intelligence code first. Reuse useful, tested logic when appropriate, but document the final implemented formula exactly.
+
+### 8.2 Temperature component
+
+Weight: `0.30`.
+
+- Optimal band: 21–24 °C → score 100.
+- From 14 °C up to but below 21 °C:
+
+\[
+s_{\text{temp}}=\frac{T-14}{21-14}\times100
+\]
+
+- From above 24 °C through 33 °C:
+
+\[
+s_{\text{temp}}=\frac{33-T}{33-24}\times100
+\]
+
+- Below 14 °C or above 33 °C: score 0.
+
+Clip the result to 0–100.
+
+Define boundary behaviour explicitly and test the endpoints.
+
+### 8.3 Relative-humidity component
+
+Weight: `0.25`.
+
+- Optimal band: 40–60% → score 100.
+- From 15% up to but below 40%:
+
+\[
+s_{\text{rh}}=\frac{\mathrm{RH}-15}{40-15}\times100
+\]
+
+- From above 60% through 85%:
+
+\[
+s_{\text{rh}}=\frac{85-\mathrm{RH}}{85-60}\times100
+\]
+
+- Below 15% or above 85%: score 0.
+
+Clip the result to 0–100.
+
+### 8.4 MQ-135 relative gas-response component
+
+Weight: `0.25`.
+
+When the baseline is valid:
+
+\[
+\mathrm{ratio}=\frac{\mathrm{MQ135}_{\mathrm{raw}}}{\mathrm{MQ135}_{\mathrm{baseline}}}
+\]
+
+- Ratio at or below 1.05: score 100.
+- Ratio at or above 2.50: score 0.
+- Otherwise:
+
+\[
+s_{\text{gas}}=
+\left(1-\frac{\mathrm{ratio}-1.05}{2.50-1.05}\right)\times100
+\]
+
+Clip to 0–100.
+
+Do not score the gas component as fully valid when the baseline is not ready or the baseline denominator is invalid.
+
+This score represents a relative sensor response, not measured pollutant concentration.
+
+### 8.5 LDR component
+
+Weight: `0.10`.
+
+Use verified thresholds:
+
+- Bright, ADC at least 1700: score 100.
+- Dim, ADC 250–1699: score 85.
+- Dark, ADC below 250: score 50.
+
+These values are configurable project-design choices. Do not describe this score as a universal lighting standard.
+
+### 8.6 Sound component
+
+Weight: `0.10`.
+
+Use current analog swing, repeated digital threshold triggers and their persistence:
+
+- Quiet/stable: score 100.
+- Moderate background activity: score 80.
+- Frequent threshold triggers or sustained high analog swing: score 40.
+
+Use deterministic, documented thresholds and configurable settings based on the existing firmware values.
+
+Do not claim calibrated dB measurements.
+
+### 8.7 Missing Data and Freshness
+
+Never replace missing or invalid readings with zero.
+
+If a component is missing or invalid, remove its weight from the active weight sum:
+
+\[
+W_{\text{active}}=\sum_{k\in\text{valid}}w_k
+\]
+
+When the core temperature and humidity readings are valid, calculate the provisional score as:
+
+\[
+\mathrm{RCI}_{\text{provisional}}
+=
+\frac{\sum_{k\in\text{valid}}w_k s_k}{W_{\text{active}}}
+\]
+
+Return `Indeterminate / Stale Telemetry` with `score: null` when:
+
+- Core temperature or humidity inputs are missing.
+- Data coverage is below 50%.
+- Required telemetry is stale beyond the configured threshold, initially 120 seconds.
+- No valid component weights remain.
+
+If coverage is below 100%, or the MQ-135 baseline is not ready, mark the score provisional and reduce confidence appropriately.
+
+### 8.8 RCI Response Schema
+
+Return at least:
+
+- `score`
+- `status`
+- `color_band`
+- `is_provisional`
+- `is_stale`
+- `data_coverage_percent`
+- `confidence_level`
+- `component_scores`
+- `main_positive_contributors`
+- `main_negative_contributors`
+- `available_inputs`
+- `unavailable_inputs`
+- `calculated_at`
+- `explanation`
+
+Keep the API result consistent with the visible UI.
+
+---
+
+## 9. EXPERIMENTAL INDOOR PM2.5 AND CO₂ ESTIMATION
+
+Create or adapt a dedicated backend module, such as:
+
+`backend/intelligence/indoor_estimation.py`
+
+Implement separate, deterministic estimator functions for indoor PM2.5 and indoor CO₂.
+
+### 9.1 Essential Accuracy Disclosures
+
+These are experimental estimates because the hardware does not include dedicated PM2.5 or CO₂ measurement sensors.
+
+Explicitly state that:
+
+- Uncalibrated heuristic outputs are demonstration estimates.
+- Their real-world accuracy is unknown.
+- The estimates are not validated direct measurements.
+- The MQ-135 signal is not uniquely convertible into CO₂ ppm or PM2.5 concentration with the information currently available.
+- A clean-air baseline and environmental proxy features do not establish scientific accuracy.
+- Actual validation requires paired reference-sensor data.
+
+Never trigger a high-confidence health or safety alarm solely from the experimental estimates.
+
+### 9.2 Input Validation
+
+Use valid, appropriately timestamp-aligned features where available:
+
+- DHT22 temperature and relative humidity.
+- MQ-135 raw ADC.
+- Verified sensor pin voltage.
+- Baseline ratio, baseline readiness and recent slope.
+- LDR brightness and classification.
+- Sound swing and trigger persistence as weak contextual proxies only.
+- Outdoor temperature, humidity and AQI.
+- Outdoor PM2.5 only when available from the optional API field.
+
+Do not treat sound activity as occupancy count or LDR brightness as a direct ventilation measurement.
+
+Do not assume every feature is always available.
+
+### 9.3 PM2.5 Estimator
+
+Implement:
+
+`estimate_indoor_pm25(...)`
+
+Support:
+
+- `heuristic_proxy` mode when no paired reference PM2.5 dataset is available.
+- A future `calibrated_model` mode only when supported by actual calibration data and validated model code.
+
+The heuristic may combine:
+
+- An outdoor particulate baseline when outdoor PM2.5 is actually available.
+- A documented fallback proxy when it is unavailable.
+- Positive MQ-135 excursions relative to an established baseline.
+- Humidity-related adjustments.
+- Persistent short-term changes.
+
+Do not claim that these terms produce a scientifically calibrated value.
+
+A project-demonstration output may be clamped to the configured numerical display bounds of 2–500 µg/m³, but the clamp must be documented and must not be represented as an accuracy guarantee.
+
+Never equate raw MQ-135 voltage directly with PM2.5 mass concentration.
+
+If essential inputs are missing or invalid, return:
+
+- `status: "insufficient_data"`
+- `value: null`
+
+Do not generate random numbers or invent validation data.
+
+### 9.4 CO₂ Estimator
+
+Implement:
+
+`estimate_indoor_co2(...)`
+
+The uncalibrated demonstration heuristic may use:
+
+- A documented nominal atmospheric baseline, initially 420 ppm.
+- Relative MQ-135 baseline excursion.
+- Available temperature and humidity context.
+- Rolling trend or accumulation proxies.
+- Weak, bounded contextual activity indicators.
+
+The nominal 420 ppm reference is an assumption for the demonstration, not a real measurement of current local outdoor CO₂.
+
+A display clamp of 400–5000 ppm can be used as a model-output boundary, but it is not evidence of accuracy.
+
+If the MQ-135 reading is missing or invalid, return insufficient data.
+
+When the MQ-135 is in warm-up or its baseline is unconditioned, explicitly mark the estimator as uncalibrated/warming up with low confidence.
+
+Do not claim that the sensor directly measures CO₂.
+
+### 9.5 Determinism and Estimation Metadata
+
+Identical inputs must yield identical output. Do not use random-number generators.
+
+Both estimators must return a consistent schema containing:
+
+- `value` — numeric or `null`
+- `unit`
+- `label: "EXPERIMENTAL ESTIMATE"`
+- `status`
+- `model_name`
+- `model_version`
+- `method`
+- `calibration_status`
+- `confidence_level`
+- `uncertainty_note`
+- `input_readiness`
+- `data_quality`
+- `limitations`
+- `calculated_at`
+
+Use accurate method labels, for example:
+
+- `heuristic_proxy`
+- `calibrated_model`
+
+Use calibration states such as:
+
+- `uncalibrated_heuristic`
+- `uncalibrated_warmup`
+- `calibrated`
+
+Do not fabricate statistical confidence intervals or numeric error margins. Use qualitative uncertainty descriptions unless genuine calibration and statistical evaluation justify more.
+
+Document how a future model could be trained and evaluated using paired reference measurements. Never train on invented targets and describe the resulting performance as validated.
+
+---
+
+## 10. LIVE OUTDOOR WEATHER AND AQI INTEGRATION
+
+Implement a resilient backend service, for example:
+
+`backend/services/outdoor_service.py`
+
+Use a suitable public provider such as Open-Meteo, verifying the current official documentation and available fields before relying on them.
+
+Official documentation:
+
+- Weather API: `https://open-meteo.com/en/docs`
+- Air Quality API: `https://open-meteo.com/en/docs/air-quality-api`
+
+Potential request patterns include:
+
+Weather:
+
+`https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m&timezone=auto`
+
+Air quality:
+
+`https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi,european_aqi&timezone=auto`
+
+Verify and correct request parameters if provider documentation changes.
+
+### 10.1 Location Settings
+
+Read `LATITUDE`, `LONGITUDE` and `LOCATION_LABEL` from configuration or runtime settings.
+
+Do not silently hardcode coordinates.
+
+Do not request browser geolocation without an explicit user action.
+
+When location is unconfigured, return a clear `location_unconfigured` status.
+
+### 10.2 Outdoor Fields
+
+Retrieve and expose:
+
+- Outdoor AQI.
+- Explicit AQI scale.
+- Outdoor temperature.
+- Outdoor relative humidity.
+- Provider/source.
+- Relevant timestamps.
+- Freshness and cache status.
+
+Outdoor PM2.5 and PM10 can be optional additional fields if requested from the source. They are not required for the core implementation.
+
+### 10.3 Caching and Error Handling
+
+Implement:
+
+- Server-side caching with an initial TTL of approximately 10–15 minutes.
+- Request timeouts of approximately five seconds.
+- Bounded retries/backoff.
+- Input and response validation.
+- Unit and AQI-scale checks.
+- Error logging.
+- Last-successful-refresh timestamps.
+- Stale-cache fallback.
+- Clear unavailable states.
+
+If the API is unavailable but valid cached data exists, return cached data with `freshness_status: "stale_cached"` and the last successful refresh time.
+
+If no usable cache exists, return `status: "unavailable"` and null values.
+
+Do not substitute fabricated numbers.
+
+All frontend components must read online data through the local Flask backend, such as `GET /api/outdoor`, rather than making independent repeated requests.
+
+### 10.4 AQI Scale and Attribution
+
+Include:
+
+- `aqi_scale`
+- AQI value.
+- Scale-appropriate category.
+- `source_type: "regional_model_estimate"` when that accurately describes the provider data.
+- Observation or model timestamp.
+- Last refresh.
+- Attribution such as `Weather & Air Quality data by Open-Meteo.com`.
+
+Never label outdoor AQI as indoor AQI or a direct indoor pollutant reading.
+
+---
+
+## 11. INDOOR-OUTDOOR COMPARISON ENGINE
+
+Create or adapt a shared module such as:
+
+`backend/intelligence/comparison_engine.py`
+
+### 11.1 Temperature
+
+Calculate:
+
+\[
+\Delta T=T_{\text{indoor}}-T_{\text{outdoor}}
+\]
+
+Return indoor temperature, outdoor temperature, delta, directional interpretation and input timestamps.
+
+Do not claim the difference proves thermal insulation efficiency.
+
+### 11.2 Relative Humidity
+
+Calculate:
+
+\[
+\Delta \mathrm{RH}
+=
+\mathrm{RH}_{\text{indoor}}
+-
+\mathrm{RH}_{\text{outdoor}}
+\]
+
+Label this result as a difference in percentage points (`pp`), not percent change.
+
+Also calculate dew point or absolute humidity using a documented Magnus–Tetens method when valid temperature and humidity data exist.
+
+Use temperature-dependent moisture context for recommendations rather than assuming that lower relative humidity outdoors always means drier air.
+
+### 11.3 Air-Quality Comparison
+
+Present side by side:
+
+- Indoor MQ-135 baseline status.
+- Experimental indoor PM2.5 estimate.
+- Experimental indoor CO₂ estimate.
+- Outdoor AQI with the explicit scale.
+- Optional outdoor particulate fields when available.
+
+**Never calculate a numerical ratio or direct difference between outdoor AQI and MQ-135 voltage/ADC or CO₂ ppm.**
+
+These values use different units and represent different measurements or proxies.
+
+### 11.4 Ventilation Assessment
+
+Return one of:
+
+- `favourable`
+- `unfavourable`
+- `mixed`
+- `indeterminate`
+
+Make the decision from validated indoor data, outdoor temperature, outdoor humidity/moisture context and outdoor AQI.
+
+Handle intermediate AQI categories explicitly.
+
+If required inputs are missing, stale or invalid, prefer `indeterminate` or `mixed` over invented certainty.
+
+Include a concise explanation and identify which evidence was unavailable.
+
+---
+
+## 12. CONTEXT-AWARE RECOMMENDATIONS AND DIAGNOSTICS
+
+Implement a shared recommendation engine, for example:
+
+`backend/intelligence/recommendation_engine.py`
+
+Use deterministic, documented thresholds. Use one consistent AQI scale for each rule and explicitly handle all relevant value ranges, including US AQI values 76–100.
+
+### Rule A — Hot Room, Cooler Outdoors, Favourable Outdoor AQI
+
+When indoor temperature is above 24 °C, outdoor temperature is at least 1 °C lower, and outdoor AQI meets the configured favourable threshold, recommend considering safe natural ventilation.
+
+The initial favourable threshold may be US AQI ≤75, but it must be configurable and documented.
+
+### Rule B — Elevated MQ-135 Signal, Unfavourable Outdoor AQI
+
+When the MQ-135 baseline-relative response is elevated and outdoor AQI is above 100, recommend checking indoor odour or gas sources, keeping windows closed against unfavourable outdoor air where appropriate, and considering suitable filtration or circulation.
+
+Do not claim direct PM2.5 or CO₂ measurement.
+
+### Rule C — Elevated MQ-135 Signal, Favourable Outdoor AQI
+
+When MQ-135 response is elevated and outdoor AQI is favourable, recommend considering ventilation where sensible, then observing whether the MQ-135 response returns toward baseline.
+
+### Rule D — Hot Room and Hotter Outdoor Air
+
+When indoor temperature is above 24 °C and outdoor temperature is at least as high as indoor temperature, avoid automatically recommending opening windows.
+
+Suggest shading, blinds, reducing internal heat sources or suitable cooling.
+
+### Rule E — High or Low Indoor Humidity
+
+When indoor RH is above 60% or below 40%:
+
+- Compare indoor and outdoor moisture conditions.
+- Use absolute humidity or dew point when valid.
+- Recommend ventilation only if it is reasonably expected to move indoor moisture conditions toward the desired range and outdoor air quality is acceptable.
+- Otherwise suggest appropriate humidity control, such as dehumidification, AC dry mode or humidification.
+
+### Rule F — Dark Room
+
+When LDR ADC is below 250, classify the room as dark and consider recommending task or ambient lighting.
+
+Do not describe ADC readings as lux.
+
+### Rule G — Elevated Sound Activity
+
+Use repeated digital triggers and sustained analog sound swing to identify relative sound activity.
+
+Recommendations may include reducing sound sources, closing doors or considering acoustic mitigation.
+
+Do not claim a calibrated dB limit has been exceeded.
+
+### Rule H — Elevated Experimental Pollutant Estimate
+
+If experimental PM2.5 or CO₂ output appears elevated according to configured heuristic thresholds, issue a clearly labelled model-based advisory.
+
+Disclose the heuristic method and uncertainty. Do not issue a high-confidence medical or safety alarm solely from an experimental estimate.
+
+### Rule I — Sensor, Calibration and Data-Quality Diagnostics
+
+Detect and expose:
+
+- Stale telemetry.
+- DHT22 reading failures.
+- MQ-135 warm-up and uncalibrated baseline.
+- Outdoor API failure or stale response.
+- Unconfigured coordinates.
+- Low RCI coverage.
+- Unavailable estimators.
+- Incomplete or invalid inputs.
+
+Explicitly inform the user when there is insufficient evidence for a strong recommendation.
+
+### Intermediate AQI Handling
+
+Do not leave US AQI values 76–100 unhandled.
+
+Configure and document:
+
+- AQI scale.
+- Category thresholds.
+- Favourable ventilation thresholds.
+- Intermediate/mixed conditions.
+- Unfavourable-air conditions.
+
+Apply category logic consistent with the selected scale. Do not mix US AQI thresholds and European AQI categories in the same decision rule.
+
+### Recommendation Response Schema
+
+Each recommendation must contain:
+
+- `id`
+- `rule_id`
+- `category`
+- `severity`
+- `title`
+- `what_is_wrong`
+- `target_metric`
+- `current_value_summary`
+- `recommended_action`
+- `explanation`
+- `indoor_evidence`
+- `outdoor_evidence`
+- `measurement_limitations`
+- `created_at`
+- `status`
+
+Implement deduplication, cooldowns, resolution and historical alert preservation using SQLite.
+
+Do not wipe existing records to implement this functionality.
+
+---
+
+## 13. BACKEND ROUTES AND ERROR HANDLING
+
+Extend the existing Flask application cleanly.
+
+Preserve existing ingestion endpoints, forecasting endpoints, database functionality and history/chart APIs.
+
+Expose or adapt the following routes:
+
+- `GET /api/comfort-index`
+- `GET /api/indoor-estimates`
+- `GET /api/outdoor`
+- `GET /api/comparison`
+- `GET /api/recommendations`
+- `GET /api/diagnostics`
+- Optional `GET/POST /api/config/location`
+
+Use shared backend functions for calculations and decision rules.
+
+Do not duplicate the RCI, estimation or recommendation formulas independently in multiple places.
+
+Handle:
+
+- Null and missing fields.
+- NaN and infinity.
+- Invalid numeric inputs.
+- Empty database tables.
+- Stale readings.
+- Unready MQ-135 baselines.
+- Outdoor API timeouts.
+- Cached data.
+- Provider response changes.
+- Database access failures.
+
+Missing or invalid values must never silently become zero.
+
+An external API failure must not crash the whole dashboard.
+
+Preserve and document stable API response contracts.
+
+---
+
+## 14. EXECUTION SAFEGUARDS AND BACKUPS
+
+Before making changes:
+
+1. Inspect existing files and implementation.
+2. Identify active telemetry paths and dependencies.
+3. Back up files that will be modified.
+4. Preserve the SQLite database and historical records.
+5. Preserve the original working sensor firmware and USB bridge.
+6. Record the current test results where feasible.
+
+Require explicit approval before:
+
+- Deleting existing working functionality.
+- Resetting the database.
+- Performing destructive schema operations.
+- Deleting historical records.
+- Changing GPIO assignments.
+- Altering physical circuit wiring.
+
+Non-destructive coding, inspection and testing can proceed directly.
+
+If a database migration is needed, design it to preserve existing data and provide a safe rollback strategy where practical.
+
+Never claim a test passed without running it.
+
+Never claim physical hardware integration succeeded when only a software mock or unit test was used.
+
+---
+
+## 15. AUTOMATED TESTING AND RESPONSIVE ACCEPTANCE
+
+Run existing tests and add comprehensive tests for all new functionality.
+
+A previous report claimed that 31 tests passed. Verify the current state rather than assuming that count is still valid.
+
+### 15.1 RCI Tests
+
+Test:
+
+- Temperature and humidity formulas.
+- RCI band boundaries, including scores of 80 and 50.
+- Component weights.
+- Invalid and missing readings.
+- Missing-data weight normalisation.
+- Stale-data handling.
+- Baseline readiness.
+- Determinism and repeatability.
+
+### 15.2 Estimator Tests
+
+Test:
+
+- PM2.5 and CO₂ outputs where inputs are sufficient.
+- Correct response metadata.
+- Explicit experimental-estimate labels.
+- Uncalibrated status and uncertainty disclosures.
+- MQ-135 warm-up behaviour.
+- Insufficient-data outcomes.
+- Null values for unavailable estimates.
+- Repeated identical inputs producing identical results.
+
+These tests prove software behaviour only, not real-world estimator accuracy.
+
+### 15.3 Outdoor API Tests
+
+Use mocked responses to test:
+
+- Successful weather parsing.
+- Successful AQI parsing.
+- AQI scale and category mapping.
+- Missing values.
+- Invalid JSON.
+- Timeouts and HTTP failures.
+- Cache TTL.
+- Stale-cache fallback.
+- Unavailable state when no cache exists.
+- Unconfigured location.
+- API freshness metadata.
+
+### 15.4 Comparison Tests
+
+Test:
+
+- Temperature delta in °C.
+- Relative-humidity difference in percentage points.
+- Dew point or absolute humidity calculations.
+- Ventilation status categories.
+- Intermediate AQI values.
+- Missing and stale inputs.
+- Absence of invalid cross-unit arithmetic.
+
+### 15.5 Recommendation Tests
+
+Test all Rules A–I, including:
+
+- Triggering conditions.
+- Non-triggering conditions.
+- Intermediate AQI cases, especially 76–100 on the US AQI scale.
+- Severity ordering.
+- Deduplication.
+- Cooldown behaviour.
+- Resolution of previous alerts.
+- Degraded-data disclosures.
+- Experimental-estimate limitations.
+
+### 15.6 Frontend and Zero-Scroll Tests
+
+Run automated browser checks using available tools such as Playwright.
+
+Test both tabs at:
+
+- 1366 × 768.
+- 1440 × 900.
+- 1920 × 1080.
+- 390 × 844.
+
+Check:
+
+- Correct default tab.
+- Tab-switching behaviour.
+- RCI rendering.
+- Sensor values and units.
+- Experimental-estimate labels.
+- Outdoor AQI and data-source status.
+- Missing, stale and loading states.
+- No overlapping or clipped cards.
+- Readability.
+- No horizontal overflow.
+- Browser-console errors.
+
+For the desktop viewports, verify document scroll dimensions against viewport dimensions. Inspect rendered pages rather than claiming success based solely on CSS settings.
+
+On mobile, explicitly test the chosen layout strategy, text readability, touch accessibility and horizontal overflow.
+
+Do not remove existing tests or weaken assertions just to make the test suite pass.
+
+---
+
+## 16. DOCUMENTATION AND FINAL ENGINEERING REPORT
+
+Update the existing documentation, including README or technical documentation as appropriate.
+
+Document:
+
+- Final RCI formula and all component scores.
+- Weight configuration and status thresholds.
+- Missing-data and stale-data behaviour.
+- MQ-135 baseline and readiness handling.
+- Experimental PM2.5 estimation methodology.
+- Experimental CO₂ estimation methodology.
+- Calibration limitations and model versions.
+- Outdoor AQI provider, scale, attribution and freshness handling.
+- Location configuration.
+- API contracts and error responses.
+- Comparison and ventilation logic.
+- Recommendation rules.
+- Existing features retained.
+- Frontend layout decisions.
+- Test execution and actual results.
+- Limitations and remaining hardware-integration work.
+
+Documentation must match the implemented code.
+
+Distinguish actual sensor measurements, online outdoor data, experimental estimates, forecasts, software test results and physical verification.
+
+Do not claim calibration, scientific validation or hardware verification without evidence.
+
+---
+
+## 17. MANDATORY IMPLEMENTATION SEQUENCE
+
+Execute in this order:
+
+1. Audit the workspace, source files, active telemetry paths, SQLite schema and existing tests.
+2. Back up files safely and preserve historical SQLite records and working firmware.
+3. Identify and regression-test existing telemetry, charts, forecasting and history functionality.
+4. Implement the authoritative RCI module with exact formulas and missing-data handling.
+5. Implement separate experimental PM2.5 and CO₂ estimators with honest uncertainty metadata.
+6. Implement the outdoor weather and AQI service with configurable location, caching and error handling.
+7. Implement indoor/outdoor comparison functions and ventilation assessment.
+8. Implement deterministic recommendation and diagnostics rules A–I.
+9. Integrate all modules into the existing Flask API.
+10. Redesign the Overview tab as a compact, zero-scroll bento layout.
+11. Redesign the Recommendations & Diagnostics tab.
+12. Integrate retained charts, trends, forecasting and historical functionality without losing existing features.
+13. Run backend tests and frontend regression tests.
+14. Test and inspect both tabs at all required viewport sizes.
+15. Fix overflow, clipping, console errors and failed assertions.
+16. Update documentation and produce the final engineering report.
+
+Do not stop after producing a plan. Inspect the project and execute the work in the workspace.
+
+---
+
+## 18. DEFINITION OF DONE
+
+The implementation is complete only when each requirement is verified or explicitly identified as pending.
+
+### Frontend
+- Both primary tabs work.
+- Overview is the default.
+- RCI is calculated dynamically by the backend.
+- All existing sensor readings are displayed correctly.
+- PM2.5 and CO₂ estimates are clearly labelled experimental.
+- Outdoor AQI is sourced from the configured live API or correctly identified cache.
+- Indoor/outdoor comparisons use physically appropriate units.
+- Recommendations explain the issue, evidence and appropriate action.
+- Existing trends and forecasting remain accessible.
+- The layouts are tested at all required viewports.
+- Error, stale, missing-data and unavailable states work correctly.
+
+### Backend and intelligence
+- One authoritative RCI formula is implemented.
+- PM2.5 and CO₂ estimators return deterministic, qualified outputs.
+- Outdoor AQI includes provider, scale and freshness.
+- Comparison logic avoids invalid unit mixing.
+- Recommendations follow deterministic rules.
+- External API failures do not crash the app.
+- Existing data and telemetry paths remain intact.
+- Existing working functionality passes regression tests.
+
+### Testing
+- Existing tests have been run.
+- New functionality has appropriate unit and integration tests.
+- Test results include actual pass/fail output.
+- Software verification is distinguished from physical hardware verification.
+- No unverified behaviour is described as completed.
+
+### Final report
+Provide:
+
+1. A summary of implemented changes.
+2. A list of created and modified files.
+3. Existing features preserved.
+4. Test commands and actual results.
+5. Screenshots or verified descriptions of both dashboard tabs where practical.
+6. Viewport verification results.
+7. Estimation assumptions and limitations.
+8. Remaining defects or integration blockers.
+9. Any steps requiring physical hardware, external configuration or user approval.
+
+**Begin by inspecting the existing workspace and executing Step 1. Preserve existing functionality, implement the complete solution, run the tests and report results honestly.**
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-19T22:56:13+05:30.
+</ADDITIONAL_METADATA>

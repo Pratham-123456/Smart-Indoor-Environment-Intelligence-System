@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEIS — Smart Indoor Environmental Intelligence System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Compact Persistent Header -->
+    <header class="navbar" role="banner">
+        <div class="nav-left">
+            <div class="brand">
+                <span class="brand-icon" aria-hidden="true">🌿</span>
+                <div class="brand-text">
+                    <span class="brand-title">SIEIS <span class="brand-pill">v2.0</span></span>
+                    <span class="brand-sub">Smart Indoor Environmental Intelligence</span>
+                </div>
+            </div>
+            
+            <!-- Accessible Primary Tabs -->
+            <nav role="tablist" class="tab-list" aria-label="Dashboard Views">
+                <button id="tab-overview" role="tab" aria-selected="true" aria-controls="panel-overview" tabindex="0" class="tab-btn active">
+                    Overview
+                </button>
+                <button id="tab-recommendations" role="tab" aria-selected="false" aria-controls="panel-recommendations" tabindex="-1" class="tab-btn">
+                    Recommendations & Diagnostics
+                    <span id="badge-rec-count" class="badge-count hidden">0</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="nav-right">
+            <!-- Subsystem Status Pills -->
+            <div class="status-pill-group" aria-label="Subsystem Health">
+                <span id="pill-usb" class="status-pill" title="Hardware USB Serial Bridge">
+                    <span class="dot"></span><span class="pill-text">USB: COM4</span>
+                </span>
+                <span id="pill-wifi" class="status-pill" title="ESP32 Wi-Fi Telemetry">
+                    <span class="dot"></span><span class="pill-text">Wi-Fi HTTP</span>
+                </span>
+                <span id="pill-outdoor" class="status-pill" title="Live Outdoor Open-Meteo Weather & AQI">
+                    <span class="dot"></span><span class="pill-text">Outdoor API</span>
+                </span>
+                <span id="pill-age" class="telemetry-age-pill" title="Time elapsed since latest sensor packet">
+                    <span id="telemetry-age-text">Live: 0s</span>
+                </span>
+            </div>
+
+            <!-- Header Controls -->
+            <div class="nav-actions">
+                <a href="/report" target="_blank" rel="noopener noreferrer" class="action-btn" title="View & Print Full Engineering Report" style="text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    📄 Report
+                </a>
+                <button id="btn-location-modal" class="action-btn" title="Configure Geographic Coordinates" aria-haspopup="dialog">
+                    📍 <span id="header-location-name">Vellore, Tamil Nadu, India</span>
+                </button>
+                <button id="btn-tools-modal" class="action-btn" title="Hardware Bridge & Live Simulation Tools" aria-haspopup="dialog">
+                    ⚙️ Tools
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Viewport Area (Strict Zero-Scroll on Desktop) -->
+    <main class="main-content" role="main">
+
+        <!-- ==================================================== -->
+        <!-- TAB 1: OVERVIEW PANEL                                -->
+        <!-- ==================================================== -->
+        <section id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" class="tab-panel active">
+            <div class="overview-grid">
+                
+                <!-- Bento Cell 1: RCI Hero Card -->
+                <div class="bento-card rci-hero-card">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <h2>Room Comfort Index</h2>
+                            <span class="info-tag">Authoritative Multi-Channel Index</span>
+                        </div>
+                        <span id="rci-coverage-badge" class="chip">100% Coverage</span>
+                    </div>
+
+                    <div class="rci-hero-body">
+                        <div class="rci-dial-wrap">
+                            <svg class="rci-svg" viewBox="0 0 100 100" aria-hidden="true">
+                                <circle class="rci-dial-bg" cx="50" cy="50" r="42" />
+                                <circle id="rci-dial-progress" class="rci-dial-fill" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="0" />
+                            </svg>
+                            <div class="rci-dial-center">
+                                <span id="rci-score-number" class="rci-number">--</span>
+                                <span class="rci-denom">/ 100</span>
+                            </div>
+                        </div>
+
+                        <div class="rci-status-block">
+                            <div id="rci-status-badge" class="status-badge status-green">Optimal / Comfortable</div>
+                            <div class="rci-meta-row">
+                                <span>Confidence: <strong id="rci-confidence-val">High</strong></span>
+                                <span id="rci-stale-tag" class="stale-warn-tag hidden">⚠️ Stale Telemetry</span>
+                            </div>
+                            <div class="rci-factors">
+                                <div class="factor-item">
+                                    <span class="factor-icon pos">▲</span>
+                                    <span id="rci-positive-factor" class="factor-text">All parameters in optimal zone</span>
+                                </div>
+                                <div class="factor-item">
+                                    <span class="factor-icon neg">▼</span>
+                                    <span id="rci-negative-factor" class="factor-text">None</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Cell 2: Live Outdoor Weather & AQI -->
+                <div class="bento-card outdoor-card">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <h2>Outdoor Atmosphere</h2>
+                            <span class="info-tag" id="outdoor-source-tag">Open-Meteo Regional Model</span>
+                        </div>
+                        <div class="card-actions-group">
+                            <button id="btn-refresh-weather" class="btn-refresh-weather" title="Force Refresh Fresh Outdoor Weather from Internet">
+                                <span class="refresh-icon">🔄</span> <span class="refresh-label">Refresh</span>
+                            </button>
+                            <span id="outdoor-freshness-badge" class="chip chip-live">Live</span>
+                        </div>
+                    </div>
+                    <div class="outdoor-body">
+                        <div class="outdoor-aqi-block">
+                            <div class="aqi-val-group">
+                                <span id="outdoor-aqi-val" class="aqi-big-val">--</span>
+                                <div class="aqi-scale-meta">
+                                    <span class="aqi-scale-label">US AQI</span>
+                                    <span id="outdoor-aqi-category" class="aqi-category-badge">Unknown</span>
+                                </div>
+                            </div>
+                            <div class="outdoor-weather-row">
+                                <div class="outdoor-metric">
+                                    <span class="m-lbl">Outdoor Temp</span>
+                                    <span id="outdoor-temp-val" class="m-val">-- °C</span>
+                                </div>
+                                <div class="outdoor-metric">
+                                    <span class="m-lbl">Outdoor RH</span>
+                                    <span id="outdoor-rh-val" class="m-val">-- %</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="outdoor-meta-strip">
+                            <span id="outdoor-observed-time" class="meta-item" title="Provider snapshot timestamp and age">Observed: --</span>
+                            <span id="outdoor-fetched-time" class="meta-item" title="Backend retrieval timestamp">Fetched: --</span>
+                        </div>
+                        <div class="outdoor-attribution">
+                            <span id="outdoor-location-label" class="loc-label">Vellore, Tamil Nadu, India</span>
+                            <span id="outdoor-attribution-text" class="attr-text">Weather & AQI by Open-Meteo.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Cell 3: Indoor-Outdoor Comparison & Ventilation -->
+                <div class="bento-card comparison-card">
+                    <div class="card-head">
+                        <div class="card-title-group">
+                            <h2>Comparison & Ventilation</h2>
+                            <span class="info-tag">Psychrometric Delta</span>
+                        </div>
+                        <span id="vent-rating-badge" class="rating-badge rating-favourable">Favourable</span>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="deltas-grid">
+                            <div class="delta-box">
+                                <span class="d-label">Δ Temperature</span>
+                                <span id="delta-temp-val" class="d-val">-- °C</span>
+                                <span id="delta-temp-note" class="d-sub">Indeterminate</span>
+                            </div>
+                            <div class="delta-box">
+                                <span class="d-label">Δ Humidity (pp)</span>
+                                <span id="delta-rh-val" class="d-val">-- pp</span>
+                                <span id="delta-rh-note" class="d-sub">Percentage points</span>
+                            </div>
+                            <div class="delta-box">
+                                <span class="d-label">Indoor Dew Point</span>
+                                <span id="dew-point-val" class="d-val">-- °C</span>
+                                <span class="d-sub">Magnus-Tetens</span>
+                            </div>
+                            <div class="delta-box">
+                                <span class="d-label">Absolute Moisture</span>
+                                <span id="abs-humidity-val" class="d-val">-- g/m³</span>
+                                <span id="delta-ah-val" class="d-sub">Δ AH: --</span>
+                            </div>
+                        </div>
+                        <div class="vent-explanation-box">
+                            <span class="vent-label">Ventilation Decision:</span>
+                            <p id="vent-explanation-text">Awaiting validated telemetry to formulate ventilation advice...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Row 2: 5 Indoor Measured Sensor Cards -->
+                <div class="sensor-cards-strip">
+                    
+                    <!-- Sensor 1: Temperature (DHT22) -->
+                    <div class="sensor-tile">
+                        <div class="tile-top">
+                            <span class="tile-label">DHT22 Temperature</span>
+                            <span id="tile-temp-status" class="tile-chip">Target: 21-24°C</span>
+                        </div>
+                        <div class="tile-val-row">
+                            <span id="tile-temp-val" class="tile-val">--</span>
+                            <span class="tile-unit">°C</span>
+                        </div>
+                        <div class="tile-subtext">Optimal: 21.0 - 24.0 °C</div>
+                    </div>
+
+                    <!-- Sensor 2: Humidity (DHT22) -->
+                    <div class="sensor-tile">
+                        <div class="tile-top">
+                            <span class="tile-label">DHT22 Humidity</span>
+                            <span id="tile-rh-status" class="tile-chip">Target: 40-60%</span>
+                        </div>
+                        <div class="tile-val-row">
+                            <span id="tile-rh-val" class="tile-val">--</span>
+                            <span class="tile-unit">%</span>
+                        </div>
+                        <div class="tile-subtext" id="tile-dewpoint-sub">Dew Point: -- °C</div>
+                    </div>
+
+                    <!-- Sensor 3: LDR Brightness -->
+                    <div class="sensor-tile">
+                        <div class="tile-top">
+                            <span class="tile-label">Ambient Brightness</span>
+                            <span id="tile-ldr-badge" class="tile-chip chip-dark">Dark</span>
+                        </div>
+                        <div class="tile-val-row">
+                            <span id="tile-ldr-val" class="tile-val">--</span>
+                            <span class="tile-unit">ADC count</span>
+                        </div>
+                        <div class="tile-subtext warning-color">Relative Brightness — Not Lux</div>
+                    </div>
+
+                    <!-- Sensor 4: MQ-135 Gas Signal -->
+                    <div class="sensor-tile">
+                        <div class="tile-top">
+                            <span class="tile-label">MQ-135 Gas Response</span>
+                            <span id="tile-mq-badge" class="tile-chip">Baseline Ready</span>
+                        </div>
+                        <div class="tile-val-row">
+                            <span id="tile-mq-val" class="tile-val">--</span>
+                            <span class="tile-unit">mV</span>
+                            <span id="tile-mq-ratio" class="tile-ratio-tag">1.00x</span>
+                        </div>
+                        <div class="tile-subtext warning-color">Relative Gas Signal — Not Calibrated</div>
+                    </div>
+
+                    <!-- Sensor 5: LM393 Sound -->
+                    <div class="sensor-tile">
+                        <div class="tile-top">
+                            <span class="tile-label">Acoustic Activity</span>
+                            <span id="tile-sound-trigger" class="tile-chip">Quiet</span>
+                        </div>
+                        <div class="tile-val-row">
+                            <span id="tile-sound-val" class="tile-val">--</span>
+                            <span class="tile-unit">swing</span>
+                        </div>
+                        <div class="tile-subtext warning-color">Relative Sound Swing — Not dB</div>
+                    </div>
+                </div>
+
+                <!-- Bento Row 3: Experimental Estimates & Trends Bar -->
+                <div class="bottom-strip-grid">
+                    
+                    <!-- Experimental Estimates Card -->
+                    <div class="bento-card estimates-card">
+                        <div class="card-head">
+                            <div class="card-title-group">
+                                <h2>Experimental Indoor Estimates</h2>
+                                <span class="info-tag">Heuristic Multi-Sensor Proxies</span>
+                            </div>
+                            <span class="experimental-badge">EXPERIMENTAL ESTIMATE</span>
+                        </div>
+                        <div class="estimates-body">
+                            <div class="estimate-column">
+                                <div class="est-header">
+                                    <span class="est-title">Estimated PM2.5</span>
+                                    <span id="pm25-cal-status" class="est-chip">Uncalibrated Proxy</span>
+                                </div>
+                                <div class="est-val-row">
+                                    <span id="est-pm25-val" class="est-val">--</span>
+                                    <span class="est-unit">µg/m³</span>
+                                </div>
+                                <div class="est-note">Derived from ambient gas excursions & RH hygroscopic factors.</div>
+                            </div>
+                            <div class="estimate-column">
+                                <div class="est-header">
+                                    <span class="est-title">Estimated CO₂</span>
+                                    <span id="co2-cal-status" class="est-chip">Uncalibrated Proxy</span>
+                                </div>
+                                <div class="est-val-row">
+                                    <span id="est-co2-val" class="est-val">--</span>
+                                    <span class="est-unit">ppm</span>
+                                </div>
+                                <div class="est-note">Derived from MQ-135 baseline elevation over 420 ppm clean air.</div>
+                            </div>
+                        </div>
+                        <div class="estimates-disclaimer">
+                            ⚠️ Demonstration proxy estimates only. The system lacks dedicated laser optical or NDIR sensors.
+                        </div>
+                    </div>
+
+                    <!-- Historical & Forecast Bar -->
+                    <div class="bento-card forecast-card">
+                        <div class="card-head">
+                            <div class="card-title-group">
+                                <h2>Trend Analysis & Horizons</h2>
+                                <span class="info-tag">Slope-Based Projections</span>
+                            </div>
+                            <button id="btn-open-charts-modal" class="btn-sm btn-chart" aria-haspopup="dialog">
+                                📈 Interactive Charts
+                            </button>
+                        </div>
+                        <div class="forecast-body">
+                            <div class="forecast-chips-row">
+                                <div class="fc-chip">
+                                    <span class="fc-lbl">Temp (+5m)</span>
+                                    <span id="fc-temp-5" class="fc-val">-- °C</span>
+                                </div>
+                                <div class="fc-chip">
+                                    <span class="fc-lbl">Temp (+15m)</span>
+                                    <span id="fc-temp-15" class="fc-val">-- °C</span>
+                                </div>
+                                <div class="fc-chip">
+                                    <span class="fc-lbl">Humidity (+15m)</span>
+                                    <span id="fc-rh-15" class="fc-val">-- %</span>
+                                </div>
+                                <div class="fc-chip">
+                                    <span class="fc-lbl">MQ-135 Trend</span>
+                                    <span id="fc-gas-trend" class="fc-val">Stable</span>
+                                </div>
+                            </div>
+                            <div class="trend-summary-text" id="trend-summary-text">
+                                Historical sliding regression indicates stable thermal and hygric conditions.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==================================================== -->
+        <!-- TAB 2: RECOMMENDATIONS & DIAGNOSTICS PANEL          -->
+        <!-- ==================================================== -->
+        <section id="panel-recommendations" role="tabpanel" aria-labelledby="tab-recommendations" class="tab-panel hidden">
+            <div class="recs-grid">
+                
+                <!-- Left Column: Actions & Issues -->
+                <div class="recs-left-col">
+                    
+                    <!-- Top Issue Hero Card -->
+                    <div class="bento-card top-issue-card">
+                        <div class="card-head">
+                            <div class="card-title-group">
+                                <h2>Highest-Priority Action</h2>
+                                <span class="info-tag">Context-Aware Rule Engine</span>
+                            </div>
+                            <span id="hero-rec-severity" class="chip chip-sev">NORMAL</span>
+                        </div>
+                        <div class="top-issue-body">
+                            <h3 id="hero-rec-title" class="hero-issue-title">All Environmental Parameters Nominal</h3>
+                            <div class="issue-details-grid">
+                                <div class="issue-field">
+                                    <span class="f-lbl">Diagnostic Finding:</span>
+                                    <span id="hero-rec-wrong" class="f-val">Indoor temperature, humidity, and gas signals comply with target comfort bounds.</span>
+                                </div>
+                                <div class="issue-field">
+                                    <span class="f-lbl">Target Metric:</span>
+                                    <span id="hero-rec-target" class="f-val">Room Comfort Index (Target: >= 80)</span>
+                                </div>
+                                <div class="issue-field col-span-2">
+                                    <span class="f-lbl">Actionable Guidance:</span>
+                                    <p id="hero-rec-action" class="hero-action-text">No active intervention required. Maintain current environmental settings.</p>
+                                </div>
+                            </div>
+                            <div class="evidence-box">
+                                <span class="ev-lbl">Contextual Evidence:</span>
+                                <span id="hero-rec-evidence" class="ev-val">Indoor: Nominal | Outdoor: Clean</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Active Issues List -->
+                    <div class="bento-card secondary-issues-card">
+                        <div class="card-head">
+                            <div class="card-title-group">
+                                <h2>Active Recommendations & Advisories</h2>
+                                <span class="info-tag" id="recs-count-label">0 Active Items</span>
+                            </div>
+                            <span class="chip">Severity Ordered</span>
+                        </div>
+                        <div id="secondary-recs-list" class="secondary-recs-scroll">
+                            <div class="empty-recs-placeholder">No secondary alerts. All sensor systems operating within standard bounds.</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: 9-Subsystem Diagnostics Matrix -->
+                <div class="recs-right-col">
+                    <div class="bento-card diagnostics-card">
+                        <div class="card-head">
+                            <div class="card-title-group">
+                                <h2>Diagnostics Matrix</h2>
+                                <span class="info-tag">9-Subsystem Health State</span>
+                            </div>
+                            <span id="diag-refresh-tag" class="chip chip-live">Live Monitored</span>
+                        </div>
+                        
+                        <div class="diag-matrix-grid">
+                            
+                            <div class="diag-cell" id="diag-cell-usb">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">USB Serial Bridge</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-usb">COM4 Connected</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-wifi">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-gray"></span>
+                                    <span class="diag-name">Wi-Fi HTTP Telemetry</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-wifi">Standby</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-backend">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">Flask Backend</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-backend">Healthy (Port 5000)</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-database">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">SQLite Persistence</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-database">Active (sieis.db)</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-dht22">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">DHT22 Digital Interface</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-dht22">Healthy readings</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-mq135">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">MQ-135 Gas Channel</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-mq135">Conditioned / Ready</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-estimators">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">Experimental Estimators</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-estimators">Uncalibrated Heuristic</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-outdoor">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">Open-Meteo Outdoor API</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-outdoor">Live (Cached 15m)</div>
+                            </div>
+
+                            <div class="diag-cell" id="diag-cell-rci">
+                                <div class="diag-top">
+                                    <span class="diag-dot dot-green"></span>
+                                    <span class="diag-name">RCI Coverage</span>
+                                </div>
+                                <div class="diag-sub" id="diag-sub-rci">100% Sensor Inputs</div>
+                            </div>
+
+                        </div>
+
+                        <div class="diagnostics-footer">
+                            <span class="f-note">Distinguishes hardware sensor faults from environmental conditions. Outdoor failure will never trigger false indoor alerts.</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================================================== -->
+    <!-- MODAL 1: Location Settings Modal                     -->
+    <!-- ==================================================== -->
+    <div id="modal-location" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="loc-modal-title">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="loc-modal-title">📍 Outdoor Geographic Location</h3>
+                <button class="modal-close" onclick="closeLocationModal()" aria-label="Close dialog">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Configure coordinates for live regional weather and air quality via Open-Meteo API.</p>
+                <form id="form-location" onsubmit="saveLocationSettings(event)">
+                    <div class="form-group">
+                        <label for="input-loc-label">Location Label:</label>
+                        <input type="text" id="input-loc-label" class="text-input" placeholder="e.g. Vellore, Tamil Nadu, India" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="input-latitude">Latitude (°N):</label>
+                            <input type="number" step="0.0001" id="input-latitude" class="text-input" placeholder="12.9165" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-longitude">Longitude (°E):</label>
+                            <input type="number" step="0.0001" id="input-longitude" class="text-input" placeholder="79.1325" required>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeLocationModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save & Fetch Outdoor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL 2: Simulation & Hardware Bridge Tools Modal     -->
+    <!-- ==================================================== -->
+    <div id="modal-tools" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="tools-modal-title">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="tools-modal-title">⚙️ Hardware Bridges & Telemetry Simulation</h3>
+                <button class="modal-close" onclick="closeToolsModal()" aria-label="Close dialog">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="tools-section">
+                    <h4>🔌 Direct USB Serial Bridge (Windows COM Port)</h4>
+                    <p class="modal-desc">Reads raw JSON packets from ESP32 DevKit over CP2102 serial interface.</p>
+                    <div class="serial-controls-row">
+                        <select id="serial-port-select" class="select-input">
+                            <option value="COM4" selected>COM4 (ESP32)</option>
+                        </select>
+                        <button id="btn-toggle-serial" class="btn btn-outline" onclick="toggleSerialBridge()">Connect USB</button>
+                        <button id="btn-reconnect-serial" class="btn btn-outline" onclick="reconnectSerialBridge()" title="Restart Serial Bridge">🔄 Reconnect</button>
+                        <button id="btn-reset-esp32" class="btn btn-outline" onclick="resetEsp32Hardware()" title="Send hardware reset pulse to reboot ESP32">⚡ Reboot ESP32</button>
+                    </div>
+                </div>
+
+                <div class="tools-section">
+                    <h4>⚡ Telemetry Simulation Mode (Test Scenarios)</h4>
+                    <p class="modal-desc">Inject simulated telemetry to observe real-time intelligence algorithms without altering physical sensors.</p>
+                    <div class="demo-buttons-grid">
+                        <button id="btn-toggle-demo" class="btn btn-primary" onclick="toggleDemoStream()">▶️ Start Simulation</button>
+                        <button class="btn btn-warning" onclick="triggerDemoEvent('gas_surge')">🔥 Gas Surge Event</button>
+                        <button class="btn btn-danger" onclick="triggerDemoEvent('temp_spike')">❄️ Thermal Spike Event</button>
+                        <button class="btn btn-success" onclick="triggerDemoEvent('normal')">🌿 Normal Baseline</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-primary" onclick="closeToolsModal()">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================== -->
+    <!-- MODAL 3: Interactive Historical Charts Modal          -->
+    <!-- ==================================================== -->
+    <div id="modal-charts" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="chart-modal-title">
+        <div class="modal-box modal-lg">
+            <div class="modal-header">
+                <h3 id="chart-modal-title">📈 Interactive Historical Sensor Trends & Forecasts</h3>
+                <button class="modal-close" onclick="closeChartsModal()" aria-label="Close dialog">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-controls">
+                    <label for="history-limit-select">Window Samples:</label>
+                    <select id="history-limit-select" class="select-input-sm">
+                        <option value="30">Recent 30 Samples (~2.5 min)</option>
+                        <option value="60" selected>Recent 60 Samples (~5 min)</option>
+                        <option value="120">Recent 120 Samples (~10 min)</option>
+                    </select>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="multiSensorChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

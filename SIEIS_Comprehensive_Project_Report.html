@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEIS — Comprehensive Technical Project Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for LaTeX Math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Mermaid for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+    <style>
+        :root {
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        body {
+            font-family: var(--font-main);
+            line-height: 1.65;
+            color: #1e293b;
+            background: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .report-container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 50px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .top-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .btn-print {
+            background: #0284c7;
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);
+            transition: background 0.15s ease;
+        }
+        .btn-print:hover {
+            background: #0369a1;
+        }
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+        p, li {
+            font-size: 0.98rem;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.88rem;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border: 1px solid #cbd5e1;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin: 18px 0;
+        }
+        code {
+            font-family: var(--font-mono);
+            background: #e2e8f0;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+        }
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        blockquote {
+            border-left: 4px solid #0284c7;
+            background: #f0f9ff;
+            margin: 18px 0;
+            padding: 12px 18px;
+            border-radius: 0 8px 8px 0;
+            color: #0369a1;
+        }
+        .mermaid {
+            margin: 20px 0;
+            text-align: center;
+        }
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .report-container {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .top-action-bar {
+                display: none;
+            }
+            h2 {
+                page-break-before: auto;
+            }
+            table, pre {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="top-action-bar">
+            <div>
+                <strong>Smart Indoor Environmental Intelligence System</strong> — Academic Engineering Report
+            </div>
+            <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        </div>
+        <h1 id="smart-indoor-environmental-intelligence-system-sieis">Smart Indoor Environmental Intelligence System (SIEIS)</h1>
+<h2 id="comprehensive-technical-design-full-stack-architecture-empirical-verification-review-documentation">Comprehensive Technical Design, Full-Stack Architecture, Empirical Verification &amp; Review Documentation</h2>
+<hr />
+<h3 id="project-metadata-identification">Project Metadata &amp; Identification</h3>
+<ul>
+<li><strong>Project Title:</strong> Smart Indoor Environmental Intelligence System (SIEIS)</li>
+<li><strong>Domain:</strong> Embedded IoT Systems, Applied Environmental Science, Edge Intelligence, Full-Stack Web Architecture</li>
+<li><strong>Target Deployment:</strong> Classrooms, Academic Laboratories, Shared Workspaces</li>
+<li><strong>Controller &amp; Firmware:</strong> ESP32 DevKit V1 (30-pin, CP2102 USB-to-UART) | C++ / Arduino Core</li>
+<li><strong>Backend Architecture:</strong> Python 3.14 / Flask RESTful Server | SQLite Persistence (<code>sieis.db</code>)</li>
+<li><strong>Default Geographic Location:</strong> Vellore, Tamil Nadu, India ($12.9165^\circ\text{N},\ 79.1325^\circ\text{E}$)</li>
+<li><strong>External Atmospheric Provider:</strong> Open-Meteo Weather &amp; Air Quality APIs (Cached Regional Model)</li>
+<li><strong>Frontend Architecture:</strong> Vanilla HTML5 / CSS3 / ES6 JavaScript | Zero-Scroll Bento Grid | Chart.js 4.4</li>
+<li><strong>Automated Verification:</strong> 62 / 62 Pytest Tests Passing ($100\%$ Pass Rate)</li>
+</ul>
+<hr />
+<h2 id="1-executive-summary-problem-formulation">1. Executive Summary &amp; Problem Formulation</h2>
+<h3 id="11-motivation-the-silent-deterioration-problem">1.1 Motivation &amp; The "Silent Deterioration" Problem</h3>
+<p>Conventional indoor environmental monitors operate as "dumb displays": they sample sensor pins, convert raw ADC counts into arbitrary numbers, and display them on localized LCDs without semantic context or actionable guidance. Consequently, occupants suffer from four systemic vulnerabilities:</p>
+<ol>
+<li><strong>Silent Deterioration:</strong> Thermal discomfort, carbon dioxide accumulation, and volatile organic compound (VOC) elevation occur insidiously. Occupants adapt unconsciously to deteriorating air quality until acute cognitive fatigue, headaches, or mucosal irritation manifest.</li>
+<li><strong>Reactive Rather Than Proactive Response:</strong> Action (e.g., opening windows, engaging HVAC, or dehumidifying) is typically taken long after environmental boundaries have been breached.</li>
+<li><strong>Absence of Contextual Guidance:</strong> A display indicating "$27.5^\circ\text{C}$" provides no recommendation. Without knowing whether outdoor air is cooler or polluted, an occupant cannot judge whether opening a window will cool the room or introduce particulate matter.</li>
+<li><strong>Lack of Automated Trend Analysis:</strong> Standard monitoring systems report isolated instantaneous snapshots, completely ignoring rolling baseline drifts, rate of change (first derivative), and short-term forecasting horizons ($+5\text{m}$, $+10\text{m}$, $+15\text{m}$).</li>
+</ol>
+<h3 id="12-proposed-sieis-solution">1.2 Proposed SIEIS Solution</h3>
+<p>SIEIS resolves these challenges by implementing a closed-loop <strong>Monitor $\rightarrow$ Transmit $\rightarrow$ Analyze $\rightarrow$ Decide</strong> architecture:
+- <strong>Monitor:</strong> Acquires verified physical telemetry across thermal, hygric, gas, lighting, and acoustic domains using an ESP32 edge node.
+- <strong>Transmit:</strong> Employs dual resilient paths—direct USB Serial streaming over COM4 ($115,200\text{ baud}$) and local Wi-Fi HTTP POST telemetry.
+- <strong>Analyze:</strong> Computes an authoritative Room Comfort Index (RCI, $0\text{--}100$), calculates experimental indoor $\text{PM}_{2.5}$ and $\text{CO}_2$ proxy estimates, fetches live regional outdoor data for Vellore, and executes Magnus-Tetens psychrometric delta analysis ($\Delta T$, $\Delta\text{RH}$ in percentage points, dew point, absolute moisture in $\text{g/m}^3$).
+- <strong>Decide:</strong> Runs a deterministic, 9-rule context-aware diagnostic engine (Rules A through I) that delivers prioritized, explainable guidance and continuous 9-subsystem hardware health monitoring.</p>
+<div class="mermaid">flowchart TD
+    subgraph Edge [&quot;Edge Sensor Layer (Physical ESP32 DevKit)&quot;]
+        DHT[&quot;DHT22 Sensor&lt;br/&gt;(GPIO 4: Temp &amp; RH)&quot;]
+        MQ[&quot;MQ-135 Gas Sensor&lt;br/&gt;(GPIO 34 via 10k:20k Divider)&quot;]
+        LDR[&quot;Bare LDR Sensor&lt;br/&gt;(GPIO 35 via 10k Pull-down)&quot;]
+        MIC[&quot;LM393 Sound Sensor&lt;br/&gt;(GPIO 32 AO, GPIO 26 DO)&quot;]
+    end
+
+    subgraph HardwareFW [&quot;ESP32 Firmware Layer&quot;]
+        ADC_SAMPLER[&quot;ADC Sampling &amp; Conditioning&lt;br/&gt;(11dB Attenuation, 12-bit SAR)&quot;]
+        VALIDATOR[&quot;Edge Validation &amp; CRC&lt;br/&gt;(Plausibility Clamp)&quot;]
+        SERIAL_OUT[&quot;USB Serial Stream&lt;br/&gt;(COM4 @ 115200 baud)&quot;]
+        WIFI_OUT[&quot;Wi-Fi Client&lt;br/&gt;(HTTP POST /api/sensor)&quot;]
+
+        DHT --&gt; ADC_SAMPLER
+        MQ --&gt; ADC_SAMPLER
+        LDR --&gt; ADC_SAMPLER
+        MIC --&gt; ADC_SAMPLER
+
+        ADC_SAMPLER --&gt; VALIDATOR
+        VALIDATOR --&gt; SERIAL_OUT
+        VALIDATOR -.-&gt; WIFI_OUT
+    end
+
+    subgraph BackendSvc [&quot;Flask Application Server (Port 5000)&quot;]
+        INGEST[&quot;Ingestion &amp; Reboot-Aware Deduplication&lt;br/&gt;(process_and_persist_telemetry)&quot;]
+        DB[(&quot;SQLite Database&lt;br/&gt;(backend/data/sieis.db)&quot;)]
+        BASE_MGR[&quot;MQ-135 Baseline Manager&lt;br/&gt;(20% Trimmed Mean, 30 Samples)&quot;]
+        RCI_ENG[&quot;Authoritative RCI Engine&lt;br/&gt;(Weighted Multi-Channel 0-100)&quot;]
+        EST_ENG[&quot;Experimental Proxy Estimators&lt;br/&gt;(Indoor PM2.5 &amp; CO2)&quot;]
+        OUT_SVC[&quot;Outdoor Weather &amp; AQI Service&lt;br/&gt;(Open-Meteo Vellore, 15m Cache)&quot;]
+        COMP_ENG[&quot;Comparison &amp; Psychrometrics&lt;br/&gt;(Magnus-Tetens Dew Point &amp; AH)&quot;]
+        DEC_ENG[&quot;Recommendation &amp; Diagnostic Engine&lt;br/&gt;(Rules A-I &amp; 9-Subsystem Matrix)&quot;]
+
+        SERIAL_OUT --&gt; INGEST
+        WIFI_OUT --&gt; INGEST
+        INGEST &lt;--&gt; DB
+        INGEST --&gt; BASE_MGR
+        INGEST --&gt; RCI_ENG
+        INGEST --&gt; EST_ENG
+        OUT_SVC &lt;--&gt; COMP_ENG
+        RCI_ENG --&gt; COMP_ENG
+        COMP_ENG --&gt; DEC_ENG
+    end
+
+    subgraph FrontendUI [&quot;Zero-Scroll Bento Dashboard (100vw x 100vh)&quot;]
+        HERO[&quot;RCI Hero Gauge&lt;br/&gt;(Circular SVG Dial, Coverage, Confidence)&quot;]
+        TILES[&quot;5 Physical Sensor Tiles&lt;br/&gt;(DHT22, LDR Count, MQ mV, Sound)&quot;]
+        EST_TILES[&quot;Experimental Estimates&lt;br/&gt;(PM2.5 &amp; CO2 Proxy Badges)&quot;]
+        OUT_CARD[&quot;Outdoor Atmosphere&lt;br/&gt;(Vellore Weather &amp; US AQI)&quot;]
+        COMP_CARD[&quot;Comparison &amp; Ventilation&lt;br/&gt;(Psychrometric Deltas)&quot;]
+        REC_TAB[&quot;Recommendations &amp; Diagnostics&lt;br/&gt;(Top Issue, Secondary List, Matrix)&quot;]
+
+        RCI_ENG --&gt; HERO
+        INGEST --&gt; TILES
+        EST_ENG --&gt; EST_TILES
+        OUT_SVC --&gt; OUT_CARD
+        COMP_ENG --&gt; COMP_CARD
+        DEC_ENG --&gt; REC_TAB
+    end
+</div>
+<hr />
+<h2 id="2-hardware-architecture-electrical-interface">2. Hardware Architecture &amp; Electrical Interface</h2>
+<h3 id="21-hardware-specification-pin-mapping">2.1 Hardware Specification &amp; Pin Mapping</h3>
+<p>The physical deployment uses the exact procured hardware configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Sensor / Module</th>
+<th>Physical Role</th>
+<th>Interface &amp; Pin</th>
+<th>Nominal Voltage</th>
+<th>Electrical Signal Constraints</th>
+<th>Epistemic Limitation &amp; Disclosure</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ESP32 DevKit V1</strong></td>
+<td>Processing, ADC conversion &amp; telemetry bridge</td>
+<td>CP2102 USB (<code>COM4</code>) &amp; Wi-Fi</td>
+<td>$5.0\text{V}$ USB / $3.3\text{V}$ Logic</td>
+<td>12-bit SAR ADC ($0\text{--}4095$ counts)</td>
+<td>ADC non-linearity near $0\text{V}$ and $&gt;3.1\text{V}$; attenuated with $11\text{ dB}$ for $0\text{--}3.3\text{V}$ range.</td>
+</tr>
+<tr>
+<td><strong>DHT22 (AM2302)</strong></td>
+<td>Calibrated Temperature &amp; Relative Humidity</td>
+<td>GPIO 4</td>
+<td>$3.3\text{V}$ VCC</td>
+<td>Single-bus digital bi-directional protocol with 16-bit CRC checksum</td>
+<td>Verified physical measurement. Thermal lag $\sim 10\text{--}15\text{ s}$; accuracy $\pm 0.5^\circ\text{C}$, $\pm 2\text{--}5\%\text{ RH}$.</td>
+</tr>
+<tr>
+<td><strong>MQ-135 Gas Sensor</strong></td>
+<td>Relative Gas Response (Volatile Organics)</td>
+<td>GPIO 34 (ADC1_CH6) via $10\text{ k}\Omega : 20\text{ k}\Omega$ Divider</td>
+<td>$5.0\text{V}$ VCC (Heater), $0\text{--}3.3\text{V}$ Pin</td>
+<td>Divider drops $0\text{--}5.0\text{V}$ sensor swing to $0\text{--}2.2\text{V}$ on GPIO 34 to protect ESP32</td>
+<td><strong>Relative gas response only.</strong> Broad-band metal-oxide semiconductor; non-selective to $\text{NH}_3, \text{NO}_x$, alcohol, smoke, $\text{CO}_2$. Requires rolling baseline.</td>
+</tr>
+<tr>
+<td><strong>Bare LDR Divider</strong></td>
+<td>Relative Ambient Brightness Indicator</td>
+<td>GPIO 35 (ADC1_CH7) with $10\text{ k}\Omega$ Resistor</td>
+<td>$3.3\text{V}$ VCC</td>
+<td>Analog divider junction connected to GPIO 35; pull-down to GND</td>
+<td><strong>Relative brightness only.</strong> Higher ADC = brighter. Classified: Dark ($&lt;250$), Dim ($250\text{--}1699$), Bright ($\ge 1700$). Not calibrated in Lux.</td>
+</tr>
+<tr>
+<td><strong>LM393 Sound Sensor</strong></td>
+<td>Relative Acoustic Activity Indicator</td>
+<td>GPIO 32 (Analog AO), GPIO 26 (Digital DO)</td>
+<td>$3.3\text{V}$ VCC</td>
+<td>High-speed peak-to-peak swing ($0\text{--}4095$) and binary comparator DO</td>
+<td><strong>Relative sound swing only.</strong> Not a calibrated Type 1/2 dB(A) sound level meter. Peak-to-peak swing indicates activity.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-electrical-safety-voltage-divider-verification">2.2 Electrical Safety &amp; Voltage Divider Verification</h3>
+<blockquote>
+<p>[!CAUTION]
+The MQ-135 gas sensor heating element requires a $5.0\text{V}$ supply to reach operating temperature ($\approx 300^\circ\text{C}$). The sensor's analog output ($V_{RL}$) swings between $0\text{ V}$ and $5.0\text{ V}$. Connecting this pin directly to an ESP32 GPIO would exceed the $3.3\text{V}$ absolute maximum rating and cause latch-up destruction.</p>
+</blockquote>
+<p>A passive resistive voltage divider scales the voltage safely:
+$$V_{\text{pin}} = V_{\text{sensor}} \cdot \left(\frac{R_2}{R_1 + R_2}\right)$$
+Using $R_1 = 10\text{ k}\Omega$ and $R_2 = 20\text{ k}\Omega$:
+$$V_{\text{pin}} = V_{\text{sensor}} \cdot \left(\frac{20}{10 + 20}\right) = V_{\text{sensor}} \cdot 0.667 \implies V_{\text{sensor}} = V_{\text{pin}} \cdot 1.50$$
+At maximum sensor saturation ($5.0\text{ V}$), the pin receives:
+$$V_{\text{pin, max}} = 5.0\text{ V} \cdot \frac{2}{3} \approx 3.33\text{ V}$$
+This protects the ESP32 input gate. The firmware converts the measured ADC count into millivolts and reconstructs the sensor voltage:
+$$V_{\text{pin}}\text{ (mV)} = \left(\frac{\text{ADC}}{4095}\right) \cdot 3300\text{ mV}$$
+$$V_{\text{sensor}}\text{ (mV)} = V_{\text{pin}}\text{ (mV)} \cdot 1.50$$</p>
+<h3 id="23-explicit-declaration-of-unsupported-review-1-sensors">2.3 Explicit Declaration of Unsupported Review 1 Sensors</h3>
+<p>Following the project's source-of-truth hierarchy, the system does not fabricate readings for components proposed in Review 1 that were not procured:
+- <strong>BME280:</strong> Replaced by DHT22. Barometric pressure is honestly reported as unsupported.
+- <strong>ENS160:</strong> Not procured. Replaced by the relative baseline MQ-135 channel. True TVOC in ppb and direct eCO₂ are reported as unavailable.
+- <strong>BH1750:</strong> Replaced by the bare LDR voltage divider. Calibrated Lux readings are reported as unavailable.</p>
+<p>The backend exposes these measurement boundaries via <code>GET /api/hardware-status</code>.</p>
+<hr />
+<h2 id="3-firmware-architecture-ingestion-subsystems">3. Firmware Architecture &amp; Ingestion Subsystems</h2>
+<h3 id="31-esp32-edge-firmware-firmwaresieis_esp32sieis_esp32ino">3.1 ESP32 Edge Firmware (<code>firmware/SIEIS_ESP32/SIEIS_ESP32.ino</code>)</h3>
+<p>The firmware operates on a non-blocking $5\text{--second}$ acquisition loop (<code>UPDATE_INTERVAL_MS = 5000</code>):</p>
+<ol>
+<li><strong>Acoustic Windowing:</strong> The LM393 analog output is sampled over a $50\text{--ms}$ sub-window to compute the true peak-to-peak swing:
+   $$V_{\text{swing}} = V_{\text{peak, max}} - V_{\text{peak, min}}$$</li>
+<li><strong>DHT22 Reading:</strong> Queries the 1-Wire interface with validity verification (<code>isnan</code> checks).</li>
+<li><strong>MQ-135 Conditioning:</strong> Reads 16-sample averaged ADC on GPIO 34. Tracks a $300\text{--second}$ startup heater warm-up phase (<code>WARMUP_PERIOD_MS = 300000</code>).</li>
+<li><strong>LDR Sampling:</strong> Reads GPIO 35 and maps to qualitative classifications.</li>
+<li><strong>JSON Telemetry Formulation:</strong> Formulates a strict, compliant JSON payload with sequence numbers and system uptime.</li>
+<li><strong>Dual Transport Transmission:</strong></li>
+<li><strong>USB Serial:</strong> Emits <code>[JSON] {"device_id": "esp32-sieis-01", ...}</code> over UART at $115,200\text{ baud}$.</li>
+<li><strong>Wi-Fi HTTP Client:</strong> If connected to local AP, issues <code>POST /api/sensor</code> with a 3-second timeout. If Wi-Fi fails or drops, serial telemetry continues uninterrupted.</li>
+</ol>
+<h3 id="32-usb-serial-bridge-backendserial_bridgepy">3.2 USB Serial Bridge (<code>backend/serial_bridge.py</code>)</h3>
+<p>A background daemon thread auto-connects to <code>COM4</code> upon startup:
+- Performs serial framing and newline-delimited JSON parsing.
+- Handles legacy formatted fallback strings if flashed with earlier diagnostic test sketches.
+- Automatically handles physical USB disconnections and reconnects with exponential backoff without crashing the web server.</p>
+<h3 id="33-reboot-aware-time-windowed-ingestion-backenddatabasepy">3.3 Reboot-Aware &amp; Time-Windowed Ingestion (<code>backend/database.py</code>)</h3>
+<p>To prevent replay attacks and duplicate packet ingestion while accommodating legitimate hardware reboots, <code>insert_observation()</code> uses a dual-condition deduplication algorithm:</p>
+<pre><code class="language-python"># Check for duplicate sequence number if supplied
+if seq_num is not None:
+    cur = conn.execute(
+        &quot;SELECT id, uptime_ms, received_at FROM observations WHERE device_id = ? AND sequence_number = ? ORDER BY id DESC LIMIT 1&quot;,
+        (device_id, seq_num),
+    )
+    existing = cur.fetchone()
+    if existing:
+        is_reboot = False
+        uptime_new = data.get(&quot;uptime_ms&quot;)
+        uptime_old = existing[&quot;uptime_ms&quot;]
+        # If uptime decreases, the ESP32 microcontroller has power-cycled
+        if uptime_new is not None and uptime_old is not None and uptime_new &lt; uptime_old:
+            is_reboot = True
+
+        # Check time elapsed between previous observation with this sequence number and now
+        is_recent = True
+        try:
+            if existing[&quot;received_at&quot;] and data.get(&quot;received_at&quot;):
+                t_old = datetime.fromisoformat(existing[&quot;received_at&quot;].replace(&quot;Z&quot;, &quot;+00:00&quot;))
+                t_new = datetime.fromisoformat(data[&quot;received_at&quot;].replace(&quot;Z&quot;, &quot;+00:00&quot;))
+                if abs((t_new - t_old).total_seconds()) &gt; 120:
+                    is_recent = False
+        except Exception:
+            pass
+
+        # Only reject as duplicate if it is within the same session and time window
+        if not is_reboot and is_recent:
+            logger.warning(f&quot;Duplicate packet received: device {device_id}, seq {seq_num}&quot;)
+            return existing[&quot;id&quot;], True
+</div>
+<p>This prevents the system from rejecting legitimate packets after an ESP32 power cycle.</p>
+<hr />
+<h2 id="4-authoritative-room-comfort-index-rci-engine">4. Authoritative Room Comfort Index (RCI) Engine</h2>
+<p>Implemented in <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/rci.py"><code>backend/intelligence/rci.py</code></a>, the RCI provides an authoritative composite score ($0\text{--}100$) reflecting human comfort and indoor environmental safety.</p>
+<h3 id="41-sub-component-scoring-functions">4.1 Sub-Component Scoring Functions</h3>
+<h4 id="1-temperature-component-score-s_t-weight-w_t-030">1. Temperature Component Score ($S_T$, Weight $w_T = 0.30$)</h4>
+<p>Aligned with ASHRAE Standard 55 and CIBSE recommendations:
+- <strong>Optimal Comfort Band:</strong> $21.0^\circ\text{C} \le T \le 24.0^\circ\text{C} \implies S_T = 100.0$
+- <strong>Lower Acceptable Band:</strong> $14.0^\circ\text{C} \le T &lt; 21.0^\circ\text{C}$:
+  $$S_T = \left(\frac{T - 14.0}{21.0 - 14.0}\right) \cdot 100.0$$
+- <strong>Upper Acceptable Band:</strong> $24.0^\circ\text{C} &lt; T \le 33.0^\circ\text{C}$:
+  $$S_T = \left(\frac{33.0 - T}{33.0 - 24.0}\right) \cdot 100.0$$
+- <strong>Out of Bounds:</strong> $T &lt; 14.0^\circ\text{C}$ or $T &gt; 33.0^\circ\text{C} \implies S_T = 0.0$</p>
+<h4 id="2-relative-humidity-component-score-s_h-weight-w_h-025">2. Relative Humidity Component Score ($S_H$, Weight $w_H = 0.25$)</h4>
+<p>Designed to inhibit respiratory drying ($&lt;40\%$) and mold proliferation ($&gt;60\%$):
+- <strong>Optimal Hygric Band:</strong> $40.0\% \le \text{RH} \le 60.0\% \implies S_H = 100.0$
+- <strong>Lower Acceptable Band:</strong> $15.0\% \le \text{RH} &lt; 40.0\%$:
+  $$S_H = \left(\frac{\text{RH} - 15.0}{40.0 - 15.0}\right) \cdot 100.0$$
+- <strong>Upper Acceptable Band:</strong> $60.0\% &lt; \text{RH} \le 85.0\%$:
+  $$S_H = \left(\frac{85.0 - \text{RH}}{85.0 - 60.0}\right) \cdot 100.0$$
+- <strong>Out of Bounds:</strong> $\text{RH} &lt; 15.0\%$ or $\text{RH} &gt; 85.0\% \implies S_H = 0.0$</p>
+<h4 id="3-mq-135-relative-gas-component-score-s_g-weight-w_g-025">3. MQ-135 Relative Gas Component Score ($S_G$, Weight $w_G = 0.25$)</h4>
+<p>Evaluated relative to the rolling clean-air baseline ($V_{\text{base}}$):
+$$\text{Ratio} = \frac{V_{\text{pin}}}{V_{\text{base}}}$$
+- <strong>Clean Air:</strong> $\text{Ratio} \le 1.05 \implies S_G = 100.0$
+- <strong>Elevated Contamination:</strong> $1.05 &lt; \text{Ratio} &lt; 2.50$:
+  $$S_G = \left(\frac{2.50 - \text{Ratio}}{2.50 - 1.05}\right) \cdot 100.0$$
+- <strong>Severe Degradation:</strong> $\text{Ratio} \ge 2.50 \implies S_G = 0.0$
+- <strong>Exclusion Clause:</strong> If the sensor is warming up ($\text{uptime} &lt; 300\text{ s}$) or the baseline is unconditioned, $S_G$ is assigned <code>None</code> and excluded from the normalized weighting calculation.</p>
+<h4 id="4-ambient-lighting-component-score-s_l-weight-w_l-010">4. Ambient Lighting Component Score ($S_L$, Weight $w_L = 0.10$)</h4>
+<p>Based on LDR 12-bit ADC raw count:
+- <strong>Adequate / Bright Illumination:</strong> $\text{ADC} \ge 1700 \implies S_L = 100.0$
+- <strong>Dim Ambient Illumination:</strong> $250 \le \text{ADC} &lt; 1700 \implies S_L = 85.0$
+- <strong>Dark Environment:</strong> $\text{ADC} &lt; 250 \implies S_L = 50.0$</p>
+<h4 id="5-acoustic-component-score-s_s-weight-w_s-010">5. Acoustic Component Score ($S_S$, Weight $w_S = 0.10$)</h4>
+<p>Based on LM393 analog swing and digital trigger:
+- <strong>Quiet Study / Lab Environment:</strong> $\text{Swing} &lt; 400\text{ and DO} = 0 \implies S_S = 100.0$
+- <strong>Moderate Background Acoustic Activity:</strong> $400 \le \text{Swing} &lt; 1200\text{ and DO} = 0 \implies S_S = 80.0$
+- <strong>High Acoustic Disturbance:</strong> $\text{Swing} \ge 1200\text{ or DO} = 1 \implies S_S = 40.0$</p>
+<h3 id="42-dynamic-normalization-missing-data-invariants">4.2 Dynamic Normalization &amp; Missing Data Invariants</h3>
+<p>When an optional sensor is offline or unconditioned (such as the MQ-135 during heater warm-up), the active weights are normalized dynamically:
+$$\text{RCI} = \frac{\sum_{i \in \text{available}} w_i \cdot S_i}{\sum_{i \in \text{available}} w_i}$$</p>
+<p><strong>Boundary Invariants:</strong>
+1. <strong>Core Sensor Requirement:</strong> If either temperature or humidity is missing or invalid, RCI returns <code>score: null</code>, <code>status: "INDETERMINATE"</code>, and <code>color_band: "gray"</code>.
+2. <strong>Coverage Threshold:</strong> If total active weight coverage is $&lt;50\%$, the score returns <code>null</code> with <code>INDETERMINATE</code>.
+3. <strong>Freshness Guarantee:</strong> If the observation is older than $120\text{ seconds}$, the score returns <code>null</code> with <code>is_stale: true</code>.</p>
+<hr />
+<h2 id="5-experimental-indoor-pm25-co2-estimators">5. Experimental Indoor PM2.5 &amp; CO₂ Estimators</h2>
+<p>Implemented in <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/indoor_estimation.py"><code>backend/intelligence/indoor_estimation.py</code></a>.</p>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>Regulatory and Clinical Disclosures:</strong>
+Because the physical sensor cluster lacks an optical laser particle counter (e.g., Plantower PMS5003) and an optical non-dispersive infrared (NDIR) $\text{CO}_2$ chamber, these estimators are classified as <strong>experimental demonstration proxies</strong>. They are tagged with label <code>EXPERIMENTAL ESTIMATE</code>, method <code>heuristic_proxy</code>, and calibration status <code>uncalibrated_heuristic</code>.</p>
+</blockquote>
+<h3 id="51-indoor-pm25-proxy-estimator-estimate_indoor_pm25">5.1 Indoor PM2.5 Proxy Estimator (<code>estimate_indoor_pm25</code>)</h3>
+<p>Computes a deterministic particulate concentration estimate clamped to $2.0\text{--}500.0\text{ }\mu\text{g/m}^3$:
+$$\text{PM}<em>{2.5, \text{est}} = \text{Base}</em>{\text{particle}} + \Delta_{\text{gas}} + \Delta_{\text{RH}}$$</p>
+<ol>
+<li><strong>Particulate Baseline ($\text{Base}_{\text{particle}}$):</strong>
+   If outdoor $\text{PM}<em>{2.5}$ is available from the regional Open-Meteo model, an indoor building penetration factor of $60\%$ is applied:
+   $$\text{Base}</em>{\text{particle}} = \max(5.0,\ \text{PM}_{2.5, \text{outdoor}} \cdot 0.60)$$
+   If outdoor data is unavailable, a standard clean-room default ($15.0\text{ }\mu\text{g/m}^3$) is used.</li>
+<li><strong>Gas Excursion Offset ($\Delta_{\text{gas}}$):</strong>
+   Aerosol and smoke events typically elevate metal-oxide surface conductivity:
+   $$\Delta_{\text{gas}} = \max(0.0,\ (\text{Ratio} - 1.0) \cdot 35.0)$$</li>
+<li><strong>Hygroscopic Moisture Adjustment ($\Delta_{\text{RH}}$):</strong>
+   High humidity ($\text{RH} &gt; 60\%$) promotes hygroscopic particle swelling:
+   $$\Delta_{\text{RH}} = \left(\frac{\text{RH} - 60.0}{40.0}\right) \cdot 8.0$$</li>
+</ol>
+<h3 id="52-indoor-co2-proxy-estimator-estimate_indoor_co2">5.2 Indoor CO₂ Proxy Estimator (<code>estimate_indoor_co2</code>)</h3>
+<p>Computes an indoor metabolic accumulation proxy clamped to $400\text{--}5000\text{ ppm}$:
+$$\text{CO}<em>{2, \text{est}} = \left[\text{CO}</em>{2, \text{nominal}} + \left((\text{Ratio} - 1.0)^{1.35} \cdot 750.0\right)\right] \cdot C_{\text{env}}(T, \text{RH})$$</p>
+<ul>
+<li><strong>Nominal Reference:</strong> $\text{CO}_{2, \text{nominal}} = 420.0\text{ ppm}$ (assumed atmospheric clean-air background).</li>
+<li><strong>Non-Linear Excursion:</strong> Models metabolic respiration accumulation non-linearly with gas ratio.</li>
+<li><strong>Environmental Compensation ($C_{\text{env}}$):</strong> Corrects for MQ-135 temperature/humidity cross-sensitivity relative to standard calibration conditions ($20^\circ\text{C}, 65\%\text{ RH}$):
+  $$C_{\text{env}} = 1.0 - 0.005 \cdot (T - 20.0) - 0.002 \cdot (\text{RH} - 65.0)$$</li>
+</ul>
+<hr />
+<h2 id="6-live-outdoor-integration-psychrometric-comparison">6. Live Outdoor Integration &amp; Psychrometric Comparison</h2>
+<h3 id="61-vellore-location-open-meteo-service-backendservicesoutdoor_servicepy">6.1 Vellore Location &amp; Open-Meteo Service (<code>backend/services/outdoor_service.py</code>)</h3>
+<p>Configured default location:
+- <strong>Location:</strong> <code>Vellore, Tamil Nadu, India</code>
+- <strong>Coordinates:</strong> Latitude <strong>$12.9165^\circ\text{N}$</strong>, Longitude <strong>$79.1325^\circ\text{E}$</strong>
+- <strong>API Request Pattern:</strong>
+  - Weather: <code>https://api.open-meteo.com/v1/forecast?latitude=12.9165&amp;longitude=79.1325&amp;current=temperature_2m,relative_humidity_2m&amp;timezone=auto</code>
+  - Air Quality: <code>https://air-quality-api.open-meteo.com/v1/air-quality?latitude=12.9165&amp;longitude=79.1325&amp;current=us_aqi,european_aqi,pm2_5,pm10&amp;timezone=auto</code>
+- <strong>Caching &amp; Resilience:</strong> 15-minute in-memory cache TTL, 5-second HTTP timeout, independent error handling, and stale-cache fallback on transient upstream network failure.</p>
+<h3 id="62-magnus-tetens-psychrometric-formulations">6.2 Magnus-Tetens Psychrometric Formulations</h3>
+<p>Implemented in <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/comparison_engine.py"><code>backend/intelligence/comparison_engine.py</code></a>:</p>
+<h4 id="1-temperature-delta-delta-t">1. Temperature Delta ($\Delta T$)</h4>
+<p>$$\Delta T = T_{\text{indoor}} - T_{\text{outdoor}}\quad (^\circ\text{C})$$
+Direction: <code>outdoor_cooler</code> ($\Delta T \ge 1.0$), <code>outdoor_warmer</code> ($\Delta T \le -1.0$), or <code>thermal_equilibrium</code>.</p>
+<h4 id="2-relative-humidity-delta-deltatextrh">2. Relative Humidity Delta ($\Delta\text{RH}$)</h4>
+<p>$$\Delta\text{RH} = \text{RH}<em>{\text{indoor}} - \text{RH}</em>{\text{outdoor}}\quad (\text{pp})$$
+Strictly labeled in <strong>percentage points (<code>pp</code>)</strong>, never percent change.</p>
+<h4 id="3-dew-point-temperature-t_textdew">3. Dew Point Temperature ($T_{\text{dew}}$)</h4>
+<p>Using standard Magnus-Tetens coefficients ($a = 17.27, b = 237.7^\circ\text{C}$):
+$$\alpha(T, \text{RH}) = \frac{a \cdot T}{b + T} + \ln\left(\frac{\text{RH}}{100.0}\right)$$
+$$T_{\text{dew}} = \frac{b \cdot \alpha(T, \text{RH})}{a - \alpha(T, \text{RH})}\quad (^\circ\text{C})$$</p>
+<h4 id="4-volumetric-absolute-humidity-textah">4. Volumetric Absolute Humidity ($\text{AH}$)</h4>
+<p>Calculates total moisture mass per unit volume of air ($\text{g/m}^3$):
+$$P_{\text{sat}}(T) = 6.112 \cdot \exp\left(\frac{17.67 \cdot T}{T + 243.5}\right)\quad (\text{hPa})$$
+$$\text{AH} = \frac{P_{\text{sat}}(T) \cdot \text{RH} \cdot 2.1674}{273.15 + T}\quad (\text{g/m}^3)$$
+$$\Delta\text{AH} = \text{AH}<em>{\text{indoor}} - \text{AH}</em>{\text{outdoor}}\quad (\text{g/m}^3)$$</p>
+<h3 id="63-holistic-ventilation-favourability-decision">6.3 Holistic Ventilation Favourability Decision</h3>
+<p>The engine evaluates three interdependent vectors:
+1. <strong>Thermal Advantage:</strong> Does opening windows cool a warm room ($T_{\text{in}} &gt; 24^\circ\text{C}$ and $\Delta T \ge 1.0^\circ\text{C}$)?
+2. <strong>Moisture Migration:</strong> Will outdoor air dehumidify the room ($\Delta\text{AH} \ge 1.5\text{ g/m}^3$) or introduce dampness?
+3. <strong>Outdoor Air Quality Filter:</strong>
+   - $\text{US AQI} \le 75$: Favourable outdoor air quality.
+   - $76 \le \text{US AQI} \le 100$: Intermediate air quality (cautionary / brief ventilation only).
+   - $\text{US AQI} &gt; 100$: Unfavourable air quality (natural ventilation strictly inhibited).</p>
+<p>Returns one of: <code>favourable</code>, <code>unfavourable</code>, <code>mixed</code>, or <code>indeterminate</code>.</p>
+<hr />
+<h2 id="7-context-aware-decision-engine-rules-ai">7. Context-Aware Decision Engine (Rules A–I)</h2>
+<p>Implemented in <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/recommendation_engine.py"><code>backend/intelligence/recommendation_engine.py</code></a>.</p>
+<p>Every active recommendation conforms to a deterministic schema:
+- <code>id</code>, <code>rule_id</code>, <code>category</code>, <code>severity</code> (<code>critical &gt; warning &gt; advisory &gt; info</code>)
+- <code>title</code>, <code>what_is_wrong</code>, <code>target_metric</code>, <code>current_value_summary</code>
+- <code>recommended_action</code>, <code>explanation</code>
+- <code>indoor_evidence</code>, <code>outdoor_evidence</code>, <code>measurement_limitations</code></p>
+<h3 id="71-complete-decision-rule-matrix">7.1 Complete Decision Rule Matrix</h3>
+<div class="mermaid">flowchart TD
+    START[&quot;Telemetry Evaluation&quot;] --&gt; COND_A{&quot;T_in &gt; 24°C &amp;&lt;br/&gt;Delta T &gt;= 1°C?&quot;}
+
+    COND_A -- Yes --&gt; AQI_CHECK{&quot;Outdoor US AQI?&quot;}
+    AQI_CHECK -- &quot;&lt;= 75&quot; --&gt; RULE_A[&quot;Rule A: Natural Cooling Ventilation&lt;br/&gt;(Advisory)&quot;]
+    AQI_CHECK -- &quot;76 - 100&quot; --&gt; RULE_A_INT[&quot;Rule A Intermediate: Brief Ventilation&lt;br/&gt;(Advisory)&quot;]
+    AQI_CHECK -- &quot;&gt; 100&quot; --&gt; RULE_B[&quot;Rule B: Inhibit Ventilation &amp; Run Purifier&lt;br/&gt;(Warning)&quot;]
+
+    COND_A -- No --&gt; COND_D{&quot;T_in &gt; 24°C &amp;&lt;br/&gt;T_out &gt;= T_in?&quot;}
+    COND_D -- Yes --&gt; RULE_D[&quot;Rule D: Solar Heat Ingress Mitigation&lt;br/&gt;(Warning)&quot;]
+
+    START --&gt; COND_GAS{&quot;MQ-135 Ratio &gt;= 1.25x?&quot;}
+    COND_GAS -- Yes --&gt; GAS_AQI{&quot;Outdoor US AQI?&quot;}
+    GAS_AQI -- &quot;&lt;= 75&quot; --&gt; RULE_C[&quot;Rule C: Purge Stale Air Outdoors&lt;br/&gt;(Warning)&quot;]
+    GAS_AQI -- &quot;&gt; 100&quot; --&gt; RULE_B
+
+    START --&gt; COND_HUM{&quot;RH_in &gt; 60% or &lt; 40%?&quot;}
+    COND_HUM -- &quot;&gt; 60%&quot; --&gt; RULE_E1[&quot;Rule E: Dehumidification / AC Dry Mode&lt;br/&gt;(Warning / Advisory)&quot;]
+    COND_HUM -- &quot;&lt; 40%&quot; --&gt; RULE_E2[&quot;Rule E: Ultrasonic Humidification&lt;br/&gt;(Advisory)&quot;]
+
+    START --&gt; COND_LIGHT{&quot;LDR &lt; 250 count?&quot;}
+    COND_LIGHT -- Yes --&gt; RULE_F[&quot;Rule F: Insufficient Ambient Light&lt;br/&gt;(Info)&quot;]
+
+    START --&gt; COND_SOUND{&quot;Sound &gt;= 1200 or DO=1?&quot;}
+    COND_SOUND -- Yes --&gt; RULE_G[&quot;Rule G: Acoustic Noise Mitigation&lt;br/&gt;(Advisory)&quot;]
+
+    START --&gt; COND_EST{&quot;Est PM2.5 &gt; 55 or&lt;br/&gt;Est CO2 &gt; 1200?&quot;}
+    COND_EST -- Yes --&gt; RULE_H[&quot;Rule H: Experimental Pollutant Advisory&lt;br/&gt;(Advisory)&quot;]
+
+    START --&gt; COND_DIAG{&quot;Stale Telemetry or&lt;br/&gt;Sensor Fault?&quot;}
+    COND_DIAG -- Yes --&gt; RULE_I[&quot;Rule I: Hardware &amp; Subsystem Diagnostic&lt;br/&gt;(Diagnostic)&quot;]
+</div>
+<h3 id="72-9-subsystem-health-diagnostics-matrix">7.2 9-Subsystem Health Diagnostics Matrix</h3>
+<p>To isolate operational hardware/network errors from environmental conditions, the dashboard monitors nine subsystems:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Subsystem Identifier</th>
+<th>Monitored Component</th>
+<th>Health States</th>
+<th>Meaning &amp; Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>usb_bridge</code></td>
+<td>Serial Port COM4</td>
+<td><code>connected</code>, <code>disconnected</code></td>
+<td>Reflects pyserial background worker state.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>wifi_telemetry</code></td>
+<td>HTTP Ingestion</td>
+<td><code>active</code>, <code>standby</code></td>
+<td>Reports <code>active</code> if packets received via POST within 60s.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>backend_server</code></td>
+<td>Flask Server</td>
+<td><code>healthy</code></td>
+<td>Process operational on port 5000.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>sqlite_database</code></td>
+<td>SQLite Persistence</td>
+<td><code>healthy</code>, <code>degraded</code></td>
+<td>Read/write operational on <code>sieis.db</code>.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>dht22_sensor</code></td>
+<td>Digital Interface</td>
+<td><code>healthy</code>, <code>error</code></td>
+<td>Verified CRC temperature and humidity packets.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>mq135_sensor</code></td>
+<td>Gas Channel</td>
+<td><code>healthy</code>, <code>warming_up</code>, <code>error</code></td>
+<td>Distinguishes heater conditioning from active baseline.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>experimental_estimators</code></td>
+<td>Heuristic Engine</td>
+<td><code>uncalibrated_heuristic</code>, <code>insufficient_data</code></td>
+<td>Honest proxy state indicator.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>outdoor_api</code></td>
+<td>Open-Meteo Integration</td>
+<td><code>live</code>, <code>cached</code>, <code>stale_cached</code>, <code>offline</code></td>
+<td>Regional atmospheric model connectivity.</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>rci_coverage</code></td>
+<td>Sensor Ingestion</td>
+<td><code>complete</code> ($\ge 80\%$), <code>partial</code>, <code>insufficient</code></td>
+<td>Active weight availability for RCI synthesis.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-strict-zero-scroll-bento-frontend-architecture">8. Strict Zero-Scroll Bento Frontend Architecture</h2>
+<p>Implemented across <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/templates/index.html"><code>backend/templates/index.html</code></a>, <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/static/css/style.css"><code>backend/static/css/style.css</code></a>, and <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/static/js/app.js"><code>backend/static/js/app.js</code></a>.</p>
+<h3 id="81-desktop-zero-scroll-constraints">8.1 Desktop Zero-Scroll Constraints</h3>
+<ul>
+<li>Target Viewports: $1366 \times 768$, $1440 \times 900$, and $1920 \times 1080$.</li>
+<li>Fixed Viewport Sizing: <code>width: 100vw; height: 100vh; height: 100dvh; overflow: hidden;</code></li>
+<li>Strict Layout Invariants:
+  $$\text{document.documentElement.scrollHeight} \le \text{window.innerHeight}$$
+  $$\text{document.documentElement.scrollWidth} \le \text{window.innerWidth}$$</li>
+<li>Visual Design: Bento-box layout with high-contrast slate surfaces, clear visual hierarchy, and no vertical or horizontal scrollbars.</li>
+</ul>
+<h3 id="82-primary-views-modal-architecture">8.2 Primary Views &amp; Modal Architecture</h3>
+<ol>
+<li><strong>Persistent Header ($48\text{ px}$):</strong> Logo, accessible ARIA tab list (<code>role="tablist"</code> with keyboard arrow navigation), subsystem health pills, live telemetry age badge, Vellore location selector, and hardware tools button.</li>
+<li><strong>Overview Tab (Default):</strong></li>
+<li><strong>Hero Card:</strong> SVG circular gauge with dynamic stroke-dashoffset, RCI score, status badge, coverage, and contributors.</li>
+<li><strong>Outdoor Card:</strong> Big US AQI number, scale label, category, temperature, humidity, and Vellore attribution.</li>
+<li><strong>Comparison Card:</strong> $\Delta T$, $\Delta\text{RH}$ (pp), dew point, absolute humidity, and ventilation favourability badge.</li>
+<li><strong>5 Measured Sensor Tiles:</strong> DHT22 temperature, DHT22 humidity, LDR raw count, MQ-135 mV &amp; ratio, and LM393 sound swing.</li>
+<li><strong>Experimental Estimates:</strong> $\text{PM}_{2.5}$ and $\text{CO}_2$ proxy cards with disclaimer badges.</li>
+<li><strong>Forecast Bar:</strong> $+5\text{m}$, $+15\text{m}$ thermal projections and interactive Chart.js modal button.</li>
+<li><strong>Recommendations &amp; Diagnostics Tab:</strong></li>
+<li><strong>Top Issue Hero:</strong> Diagnostic finding, target metric, actionable guidance, and supporting contextual evidence.</li>
+<li><strong>Secondary Issues List:</strong> Scrollable list of active advisories sorted by severity.</li>
+<li><strong>Diagnostics Matrix:</strong> $3 \times 3$ grid displaying real-time status dots and details for all 9 subsystems.</li>
+<li><strong>Accessible Modals:</strong></li>
+<li>Location Configuration Dialog.</li>
+<li>Simulation &amp; USB Bridge Control Dialog.</li>
+<li>Interactive Historical Trends Chart Dialog (Chart.js multi-sensor canvas).</li>
+</ol>
+<h3 id="83-mobile-responsiveness-390-times-844">8.3 Mobile Responsiveness ($390 \times 844$)</h3>
+<p>At <code>@media (max-width: 900px)</code>, the fixed zero-scroll constraints adapt into a fluid vertical column with touch-friendly cards and zero horizontal overflow (<code>scrollWidth &lt;= innerWidth</code>).</p>
+<hr />
+<h2 id="9-automated-verification-acceptance-results">9. Automated Verification &amp; Acceptance Results</h2>
+<h3 id="91-pytest-execution-record-6262-passed">9.1 Pytest Execution Record (62/62 Passed)</h3>
+<p>All 62 unit, integration, psychrometric, recommendation, and browser viewport tests pass:</p>
+<pre><code class="language-text">============================= test session starts =============================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.7.0
+rootdir: C:\Users\insan\OneDrive\Desktop\SIEIS
+configfile: pytest.ini
+testpaths: tests
+plugins: mock-3.17.0
+collected 62 items
+
+tests/test_api.py::test_health_endpoint PASSED                           [  1%]
+tests/test_api.py::test_dashboard_route_serves_html PASSED               [  3%]
+tests/test_api.py::test_hardware_status_endpoint PASSED                  [  4%]
+tests/test_api.py::test_post_sensor_telemetry_success PASSED             [  6%]
+tests/test_api.py::test_post_sensor_malformed_json_400 PASSED            [  8%]
+tests/test_api.py::test_post_sensor_missing_device_id_400 PASSED         [  9%]
+tests/test_api.py::test_get_readings_limit PASSED                        [ 11%]
+tests/test_api.py::test_get_stats_and_recommendations PASSED             [ 12%]
+tests/test_comparison_engine.py::test_magnus_tetens_dew_point PASSED     [ 14%]
+tests/test_comparison_engine.py::test_absolute_humidity PASSED           [ 16%]
+tests/test_comparison_engine.py::test_ventilation_assessment_rules PASSED [ 17%]
+tests/test_comparison_engine.py::test_compare_indoor_and_outdoor_schema PASSED [ 19%]
+tests/test_database.py::test_schema_initialization PASSED                [ 20%]
+tests/test_database.py::test_insert_observation_and_device_upsert PASSED [ 22%]
+tests/test_database.py::test_duplicate_sequence_number_detection PASSED  [ 24%]
+tests/test_database.py::test_insert_and_retrieve_scores PASSED           [ 25%]
+tests/test_database.py::test_alert_lifecycle_and_resolution PASSED       [ 27%]
+tests/test_database.py::test_baseline_history_recording PASSED           [ 29%]
+tests/test_end_to_end_sim.py::test_full_system_lifecycle_simulation PASSED [ 30%]
+tests/test_indoor_estimation.py::test_pm25_estimator_valid_bounds PASSED [ 32%]
+tests/test_indoor_estimation.py::test_pm25_estimator_missing_essential_inputs PASSED [ 33%]
+tests/test_indoor_estimation.py::test_co2_estimator_nominal_and_elevation PASSED [ 35%]
+tests/test_indoor_estimation.py::test_co2_estimator_warmup_status PASSED [ 37%]
+tests/test_intelligence.py::test_comfort_index_optimal PASSED            [ 38%]
+tests/test_intelligence.py::test_comfort_index_hot_and_humid PASSED      [ 40%]
+tests/test_intelligence.py::test_environmental_health_score_with_warmup_exclusion PASSED [ 41%]
+tests/test_intelligence.py::test_environmental_health_score_with_gas_elevation PASSED [ 43%]
+tests/test_intelligence.py::test_mq135_baseline_warmup_exclusion PASSED  [ 45%]
+tests/test_intelligence.py::test_trend_analyzer PASSED                   [ 46%]
+tests/test_intelligence.py::test_anomaly_detection_thermal_breach PASSED [ 48%]
+tests/test_intelligence.py::test_forecaster_insufficient_data PASSED     [ 50%]
+tests/test_intelligence.py::test_forecaster_extrapolation_with_slope PASSED [ 51%]
+tests/test_intelligence.py::test_decision_engine_stale_detection PASSED  [ 53%]
+tests/test_new_api_routes.py::test_api_comfort_index PASSED              [ 54%]
+tests/test_new_api_routes.py::test_api_indoor_estimates PASSED           [ 56%]
+tests/test_new_api_routes.py::test_api_outdoor_and_location PASSED       [ 58%]
+tests/test_new_api_routes.py::test_api_comparison PASSED                 [ 59%]
+tests/test_new_api_routes.py::test_api_diagnostics PASSED                [ 61%]
+tests/test_outdoor_service.py::test_classify_us_aqi PASSED               [ 62%]
+tests/test_outdoor_service.py::test_outdoor_service_caching_and_stale_fallback PASSED [ 64%]
+tests/test_rci.py::test_temperature_scoring PASSED                       [ 66%]
+tests/test_rci.py::test_humidity_scoring PASSED                          [ 67%]
+tests/test_rci.py::test_gas_scoring PASSED                               [ 69%]
+tests/test_rci.py::test_light_scoring PASSED                             [ 70%]
+tests/test_rci.py::test_sound_scoring PASSED                             [ 72%]
+tests/test_rci.py::test_rci_perfect_conditions PASSED                    [ 74%]
+tests/test_rci.py::test_rci_missing_core_returns_indeterminate PASSED    [ 75%]
+tests/test_rci.py::test_rci_stale_telemetry_returns_indeterminate PASSED [ 77%]
+tests/test_recommendation_engine.py::test_rule_a_firing PASSED           [ 79%]
+tests/test_recommendation_engine.py::test_rule_b_firing PASSED           [ 80%]
+tests/test_recommendation_engine.py::test_rule_c_firing PASSED           [ 82%]
+tests/test_recommendation_engine.py::test_rule_d_firing PASSED           [ 83%]
+tests/test_recommendation_engine.py::test_rule_f_dark_room PASSED        [ 85%]
+tests/test_recommendation_engine.py::test_rule_g_sound PASSED            [ 87%]
+tests/test_recommendation_engine.py::test_diagnostics_matrix_nine_subsystems PASSED [ 88%]
+tests/test_validation.py::test_validate_valid_full_payload PASSED        [ 90%]
+tests/test_validation.py::test_validate_missing_device_id_raises_error PASSED [ 91%]
+tests/test_validation.py::test_validate_out_of_bounds_temperature PASSED [ 93%]
+tests/test_validation.py::test_validate_nan_values PASSED                [ 95%]
+tests/test_validation.py::test_validate_derived_light_label PASSED       [ 96%]
+tests/test_validation.py::test_validate_mq135_sensor_mv_derivation PASSED [ 98%]
+tests/test_viewports.py::test_all_viewports_and_zero_scroll PASSED       [100%]
+
+============================= 62 passed in 10.45s =============================
+</div>
+<h3 id="92-viewport-zero-scroll-acceptance-data-teststest_viewportspy">9.2 Viewport Zero-Scroll Acceptance Data (<code>tests/test_viewports.py</code>)</h3>
+<p>Tested via headless Microsoft Edge DevTools Protocol (CDP):</p>
+<table>
+<thead>
+<tr>
+<th>Viewport Dimension</th>
+<th>Target Platform</th>
+<th>Tab Tested</th>
+<th><code>scrollHeight</code></th>
+<th><code>clientHeight</code></th>
+<th><code>scrollWidth</code></th>
+<th><code>clientWidth</code></th>
+<th>Test Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>$1366 \times 768$</strong></td>
+<td>Desktop Laptop</td>
+<td>Overview</td>
+<td>$768\text{ px}$</td>
+<td>$768\text{ px}$</td>
+<td>$1366\text{ px}$</td>
+<td>$1366\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$1366 \times 768$</strong></td>
+<td>Desktop Laptop</td>
+<td>Recs &amp; Diag</td>
+<td>$768\text{ px}$</td>
+<td>$768\text{ px}$</td>
+<td>$1366\text{ px}$</td>
+<td>$1366\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$1440 \times 900$</strong></td>
+<td>Desktop Medium</td>
+<td>Overview</td>
+<td>$900\text{ px}$</td>
+<td>$900\text{ px}$</td>
+<td>$1440\text{ px}$</td>
+<td>$1440\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$1440 \times 900$</strong></td>
+<td>Desktop Medium</td>
+<td>Recs &amp; Diag</td>
+<td>$900\text{ px}$</td>
+<td>$900\text{ px}$</td>
+<td>$1440\text{ px}$</td>
+<td>$1440\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$1920 \times 1080$</strong></td>
+<td>Desktop Full HD</td>
+<td>Overview</td>
+<td>$1080\text{ px}$</td>
+<td>$1080\text{ px}$</td>
+<td>$1920\text{ px}$</td>
+<td>$1920\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$1920 \times 1080$</strong></td>
+<td>Desktop Full HD</td>
+<td>Recs &amp; Diag</td>
+<td>$1080\text{ px}$</td>
+<td>$1080\text{ px}$</td>
+<td>$1920\text{ px}$</td>
+<td>$1920\text{ px}$</td>
+<td><strong>PASSED (Zero-Scroll)</strong></td>
+</tr>
+<tr>
+<td><strong>$390 \times 844$</strong></td>
+<td>Mobile Phone</td>
+<td>Both Tabs</td>
+<td>Fluid vertical</td>
+<td>Fluid vertical</td>
+<td>$390\text{ px}$</td>
+<td>$390\text{ px}$</td>
+<td><strong>PASSED (No Overflow)</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-live-empirical-hardware-verification-snapshot">10. Live Empirical Hardware Verification Snapshot</h2>
+<p>The physical ESP32 node is actively streaming telemetry on <code>COM4</code>:</p>
+<pre><code class="language-json">{
+  &quot;device_id&quot;: &quot;esp32-sieis-01&quot;,
+  &quot;received_at&quot;: &quot;2026-10-19T18:08:29Z&quot;,
+  &quot;sequence_number&quot;: 13,
+  &quot;uptime_ms&quot;: 69476,
+  &quot;temperature_c&quot;: 27.5,
+  &quot;humidity_percent&quot;: 57.2,
+  &quot;light_raw&quot;: 385,
+  &quot;light_label&quot;: &quot;dim&quot;,
+  &quot;mq135_adc_mv&quot;: 360,
+  &quot;mq135_sensor_mv&quot;: 540,
+  &quot;mq135_status&quot;: &quot;ready&quot;,
+  &quot;sound_swing&quot;: 333,
+  &quot;sound_do&quot;: 0,
+  &quot;validation_flags&quot;: &quot;OK&quot;,
+  &quot;is_valid&quot;: true
+}
+</div>
+<h3 id="empirical-synthesis">Empirical Synthesis:</h3>
+<ul>
+<li><strong>Total Ingested Observations:</strong> $1190+$</li>
+<li><strong>Physical Room Conditions:</strong> $27.5^\circ\text{C}$, $57.2\%\text{ RH}$, Dim illumination ($385$), Quiet ($333$).</li>
+<li><strong>Outdoor Vellore Conditions:</strong> $24.7^\circ\text{C}$, $98\%\text{ RH}$, $\text{US AQI } 55$ (<code>Moderate</code>), $\text{PM}_{2.5}\ 13.7\text{ }\mu\text{g/m}^3$.</li>
+<li><strong>Authoritative RCI Output:</strong> <strong>$79.0 / 100$</strong> (<code>Moderate / Needs Attention</code>, $100\%$ Sensor Coverage).</li>
+<li><strong>Ventilation Assessment:</strong> <strong><code>FAVOURABLE</code></strong> ($\Delta T = +2.8^\circ\text{C}$ cooler outdoors, clean air).</li>
+<li><strong>Active Guidance (Rule A):</strong> Natural cooling ventilation recommended.</li>
+</ul>
+<hr />
+<h2 id="11-viva-defense-alignment-examiner-question-preparation">11. Viva Defense Alignment &amp; Examiner Question Preparation</h2>
+<h3 id="q1-why-does-the-system-use-a-relative-baseline-for-the-mq-135-instead-of-displaying-direct-ppm-co2">Q1: Why does the system use a relative baseline for the MQ-135 instead of displaying direct ppm CO₂?</h3>
+<blockquote>
+<p><strong>Answer:</strong> The MQ-135 is a broad-band chemoresistive metal-oxide semiconductor (SnO₂) sensor without an optical absorption chamber. It responds non-selectively to ammonia, nitrogen oxides, ethanol, benzene, smoke, and $\text{CO}_2$. Displaying uncalibrated direct ppm numbers would misrepresent the sensor's capabilities. Using a 20% trimmed mean clean-air rolling baseline allows the system to detect contamination spikes without making unverified chemical claims.</p>
+</blockquote>
+<h3 id="q2-why-is-the-humidity-difference-reported-as-percentage-points-pp-rather-than-percent-change">Q2: Why is the humidity difference reported as percentage points (<code>pp</code>) rather than percent change?</h3>
+<blockquote>
+<p><strong>Answer:</strong> Relative humidity is already expressed as a percentage of saturation vapor pressure. A shift from $50\%$ to $60\%$ is an absolute difference of $10$ percentage points ($\text{pp}$), whereas a "10 percent increase" would imply $55\%$. Using $\text{pp}$ preserves metrological precision.</p>
+</blockquote>
+<h3 id="q3-why-does-the-system-calculate-both-relative-humidity-delta-and-absolute-humidity">Q3: Why does the system calculate both relative humidity delta and absolute humidity?</h3>
+<blockquote>
+<p><strong>Answer:</strong> Relative humidity is temperature-dependent. Cold outdoor air at $98\%\text{ RH}$ ($24.7^\circ\text{C}$) can contain more or less moisture mass than indoor air at $57.2\%\text{ RH}$ ($27.5^\circ\text{C}$). By using the Magnus-Tetens formula to compute volumetric absolute humidity in $\text{g/m}^3$, the decision engine determines actual moisture migration direction when windows are opened.</p>
+</blockquote>
+<h3 id="q4-how-does-the-system-handle-open-meteo-api-timeouts-or-regional-model-failures">Q4: How does the system handle Open-Meteo API timeouts or regional model failures?</h3>
+<blockquote>
+<p><strong>Answer:</strong> The outdoor service implements a 15-minute server-side in-memory cache and a 5-second timeout. If the upstream provider experiences a temporary outage (such as HTTP 503), the backend returns cached data tagged as <code>stale_cached</code>. This isolates the local sensor telemetry, ensuring outdoor API errors never trigger false indoor environmental alarms.</p>
+</blockquote>
+<h3 id="q5-what-is-the-purpose-of-the-9-subsystem-diagnostics-matrix">Q5: What is the purpose of the 9-subsystem diagnostics matrix?</h3>
+<blockquote>
+<p><strong>Answer:</strong> Conventional IoT monitors fail to distinguish between hardware faults and environmental hazards. If a sensor drops offline, basic monitors often report $0$ and trigger a false alarm. SIEIS isolates hardware states (DHT22 disconnected, MQ-135 warming up, telemetry stale) from environmental conditions, reporting clear diagnostic notices before generating recommendations.</p>
+</blockquote>
+<hr />
+<h3 id="conclusion-project-readiness">Conclusion &amp; Project Readiness</h3>
+<p>The <strong>Smart Indoor Environmental Intelligence System (SIEIS)</strong> satisfies all Review 1 objectives, strictly honors procured hardware boundaries, preserves all regression behavior, and delivers a robust zero-scroll intelligence dashboard.</p>
+<ul>
+<li><strong>Runnable Server:</strong> <code>python run.py</code> (running on <code>http://localhost:5000</code>)</li>
+<li><strong>Automated Tests:</strong> <code>pytest -v</code> (62/62 passing)</li>
+<li><strong>Primary Codebase:</strong></li>
+<li>Firmware: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/firmware/SIEIS_ESP32/SIEIS_ESP32.ino"><code>firmware/SIEIS_ESP32/SIEIS_ESP32.ino</code></a></li>
+<li>Intelligence RCI: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/rci.py"><code>backend/intelligence/rci.py</code></a></li>
+<li>Estimators: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/indoor_estimation.py"><code>backend/intelligence/indoor_estimation.py</code></a></li>
+<li>Outdoor Service: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/services/outdoor_service.py"><code>backend/services/outdoor_service.py</code></a></li>
+<li>Comparison: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/comparison_engine.py"><code>backend/intelligence/comparison_engine.py</code></a></li>
+<li>Decisions: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/intelligence/recommendation_engine.py"><code>backend/intelligence/recommendation_engine.py</code></a></li>
+<li>Dashboard: <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/templates/index.html"><code>backend/templates/index.html</code></a> &amp; <a href="file:///c:/Users/insan/OneDrive/Desktop/SIEIS/backend/static/css/style.css"><code>backend/static/css/style.css</code></a></li>
+</ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '\\[', right: '\\]', display: true}
+                ],
+                throwOnError: false
+            });
+        });
+    </script>
+</body>
+</html>
